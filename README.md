@@ -17,5 +17,5 @@
 # Information
 Tweakly allows you to create dynamic code, using programming methods that are normally difficult to implement, allowing the user to reduce the writing of the code as much as possible to allow the latter to concentrate on the project to be implemented.
 # Other
-Information Landing Page : https://www.filoconnesso.it/tweakly/
-Documentation (at moment doc is only italian) : https://www.filoconnesso.it/arduino-tweakly-ita-docu/
+1. Information Landing Page : https://www.filoconnesso.it/tweakly/
+2. Documentation (at moment doc is only italian) : https://www.filoconnesso.it/arduino-tweakly-ita-docu/
