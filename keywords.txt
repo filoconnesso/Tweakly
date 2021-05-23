@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring Map For ArduinoTweakly
+####################################### 
+# Class
+#######################################
+
+ArduinoTweakly	KEYWORD1
+TweaklyRun	KEYWORD1
+
+#######################################
+# Methods and Functions 
+#######################################	
+
+setTick	KEYWORD2
+padMode	KEYWORD2
+digitalToggle	KEYWORD2
+digitalToggleAll	KEYWORD2
+digitalWriteAll	KEYWORD2
+pauseTick	KEYWORD2
+digitalPushButton	KEYWORD2
+digitalSwitchButton	KEYWORD2
+playTick	KEYWORD2
+tickIsRunning	KEYWORD2
+digitalWriteClass	KEYWORD2
+
+#######################################
+# Constants
+#######################################
