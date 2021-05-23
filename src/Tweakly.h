@@ -1,6 +1,6 @@
 /*
 *
-* LIBRARY FOR WIRING ESPANSION
+* LIBRARY FOR WIRING EXSPANSION
 * Created by Mirko Pacioni
 * 12/03/2021
 *
