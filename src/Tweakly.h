@@ -8,13 +8,16 @@
 
 #include "Arduino.h"
 
+typedef void (*_tick_callback)();
+typedef void (*_encoder_callback)(bool);
+
 bool _tweakly_ready = false;
 bool _ticks_exists = false;
 bool _pad_exists = false;
-
-typedef void (*_tick_callback)();
+bool _encoder_exists = false;
 
 unsigned long _pin_button_default_debounce_millis = 50;
+unsigned long _pin_encoder_default_debounce_millis = 1;
 
 struct _ticks
 {
@@ -44,10 +47,49 @@ struct _pins
     _pins *_next_pin = nullptr;
 };
 
+struct _encoders
+{
+    char *_encoder_name;
+    int _encoder_dt_pin;
+    int _encoder_clk_pin;
+    bool _encoder_dt_pin_status;
+    bool _encoder_clk_pin_status;
+    bool _encoder_clk_pin_previous_status;
+    unsigned long _encoder_debounce_current_millis;
+    unsigned long _encoder_debounce_previous_millis;
+    unsigned long _encoder_debounce_delay_millis;
+    _encoder_callback _encoder_change_callback;
+    _encoders *_next_encoder = nullptr;
+};
+
 _ticks *_first_tick = nullptr, *_last_tick = nullptr;
 _pins *_first_pin = nullptr, *_last_pin = nullptr;
+_encoders *_first_encoder = nullptr, *_last_encoder = nullptr;
 
-void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_status, char* _pin_class = "nope")
+
+void encoderAttach(int _new_encoder_dt_pin, int _new_encoder_clk_pin, _encoder_callback _new_encoder_change_callback)
+{
+    _encoders *_new_encoder = new _encoders;
+    _new_encoder->_encoder_dt_pin = _new_encoder_dt_pin;
+    _new_encoder->_encoder_clk_pin = _new_encoder_clk_pin;
+    if (_first_encoder == nullptr)
+    {
+        _first_encoder = _new_encoder;
+    }
+    else
+    {
+        _last_encoder->_next_encoder = _new_encoder;
+    }
+    _new_encoder->_encoder_change_callback = _new_encoder_change_callback;
+    _new_encoder->_encoder_debounce_delay_millis = _pin_encoder_default_debounce_millis;
+    _last_encoder = _new_encoder;
+    if (!_encoder_exists)
+    {
+        _encoder_exists = true;
+    }
+}
+
+void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_status, char *_pin_class = "nope")
 {
     _pins *_new_pin = new _pins;
     _new_pin->_pin_number = _new_pin_number;
@@ -125,7 +167,6 @@ void digitalWriteAll(int _digital_status)
         }
     }
 }
-
 void digitalWriteClass(char* _digital_pin_class, int _digital_status)
 {
     if (_pad_exists)
@@ -249,15 +290,30 @@ void TweaklyRun()
     unsigned long _current_millis = millis();
     if (!_tweakly_ready)
     {
-        for (_ticks *_this_tick = _first_tick; _this_tick != nullptr; _this_tick = _this_tick->_next_tick)
+        if (_ticks_exists)
         {
-            _this_tick->_tick_previous_time = _current_millis;
-        }
-        for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
-        {
-            if (_this_pin->_pin_mode != OUTPUT)
+            for (_ticks *_this_tick = _first_tick; _this_tick != nullptr; _this_tick = _this_tick->_next_tick)
             {
-                _this_pin->_pin_debounce_previous_millis = _current_millis;
+                _this_tick->_tick_previous_time = _current_millis;
+            }
+        }
+        if (_pad_exists)
+        {
+            for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+            {
+                if (_this_pin->_pin_mode != OUTPUT)
+                {
+                    _this_pin->_pin_debounce_previous_millis = _current_millis;
+                }
+            }
+        }
+        if (_encoder_exists)
+        {
+            for (_encoders *_this_encoder = _first_encoder; _this_encoder != nullptr; _this_encoder = _this_encoder->_next_encoder)
+            {
+
+                _this_encoder->_encoder_debounce_previous_millis = _current_millis;
+                _this_encoder->_encoder_clk_pin_previous_status = digitalRead(_this_encoder->_encoder_clk_pin);
             }
         }
         _tweakly_ready = true;
@@ -303,6 +359,24 @@ void TweaklyRun()
                             _this_pin->_pin_switch_status = !_this_pin->_pin_switch_status;
                         }
                     }
+                }
+            }
+        }
+        if (_encoder_exists)
+        {
+            for (_encoders *_this_encoder = _first_encoder; _this_encoder != nullptr; _this_encoder = _this_encoder->_next_encoder)
+            {
+                _this_encoder->_encoder_debounce_current_millis = _current_millis;
+                if (_this_encoder->_encoder_debounce_current_millis - _this_encoder->_encoder_debounce_previous_millis > _this_encoder->_encoder_debounce_delay_millis)
+                {
+                    _this_encoder->_encoder_clk_pin_status = digitalRead(_this_encoder->_encoder_clk_pin);
+                    _this_encoder->_encoder_debounce_previous_millis = _this_encoder->_encoder_debounce_current_millis;
+                    if (_this_encoder->_encoder_clk_pin_status != _this_encoder->_encoder_clk_pin_previous_status && _this_encoder->_encoder_clk_pin_status == HIGH)
+                    {
+                        _this_encoder->_encoder_dt_pin_status = digitalRead(_this_encoder->_encoder_dt_pin);
+                        _this_encoder->_encoder_change_callback(_this_encoder->_encoder_dt_pin_status);
+                    }
+                    _this_encoder->_encoder_clk_pin_previous_status = _this_encoder->_encoder_clk_pin_status;
                 }
             }
         }
