@@ -8,6 +8,10 @@
 
 #include "Arduino.h"
 
+#ifndef nullptr
+#define nullptr NULL
+#endif
+
 typedef void (*_tick_callback)();
 typedef void (*_encoder_callback)(bool);
 
