@@ -1,6 +1,6 @@
 /*
 *
-*  NO BLOCKING BLINK FOR ARDUINO TWEAKLY
+*  NO BLOCKING BLINK FOR TWEAKLY
 *  Created By Mirko Pacioni
 *
 */

@@ -1,10 +1,10 @@
 #######################################
-# Syntax Coloring Map For ArduinoTweakly
+# Syntax Coloring Map For Tweakly
 ####################################### 
 # Class
 #######################################
 
-ArduinoTweakly	KEYWORD1
+Tweakly	KEYWORD1
 TweaklyRun	KEYWORD1
 
 #######################################

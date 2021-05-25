@@ -18,7 +18,7 @@ unsigned long _pin_button_default_debounce_millis = 50;
 
 struct _ticks
 {
-    char _tick_name;
+    char* _tick_name;
     unsigned long _tick_current_millis;
     unsigned long _tick_delay;
     unsigned long _tick_previous_time;
@@ -37,7 +37,7 @@ struct _pins
     bool _pin_switch_status;
     bool _pin_switch_release_button;
     int _pin_mode;
-    char _pin_class;
+    char* _pin_class;
     unsigned long _pin_debounce_current_millis;
     unsigned long _pin_debounce_previous_millis;
     unsigned long _pin_debounce_delay_millis;
@@ -47,7 +47,7 @@ struct _pins
 _ticks *_first_tick = nullptr, *_last_tick = nullptr;
 _pins *_first_pin = nullptr, *_last_pin = nullptr;
 
-void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_status, char _pin_class = "nope")
+void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_status, char* _pin_class = "nope")
 {
     _pins *_new_pin = new _pins;
     _new_pin->_pin_number = _new_pin_number;
@@ -126,7 +126,7 @@ void digitalWriteAll(int _digital_status)
     }
 }
 
-void digitalWriteClass(char _digital_pin_class, int _digital_status)
+void digitalWriteClass(char* _digital_pin_class, int _digital_status)
 {
     if (_pad_exists)
     {
@@ -175,7 +175,7 @@ bool digitalSwitchButton(int _digital_pin)
     }
 }
 
-void setTick(char _new_tick_name, unsigned long _new_tick_delay, _tick_callback _new_tick_callback)
+void setTick(char* _new_tick_name, unsigned long _new_tick_delay, _tick_callback _new_tick_callback)
 {
     _ticks *_new_tick = new _ticks;
     _new_tick->_tick_name = _new_tick_name;
@@ -198,7 +198,7 @@ void setTick(char _new_tick_name, unsigned long _new_tick_delay, _tick_callback 
     }
 }
 
-void pauseTick(char _tick_name)
+void pauseTick(char* _tick_name)
 {
     if (_ticks_exists)
     {
@@ -212,7 +212,7 @@ void pauseTick(char _tick_name)
     }
 }
 
-void playTick(char _tick_name)
+void playTick(char* _tick_name)
 {
     if (_ticks_exists)
     {
@@ -226,7 +226,7 @@ void playTick(char _tick_name)
     }
 }
 
-bool tickIsRunning(char _tick_name)
+bool tickIsRunning(char* _tick_name)
 {
     if (_ticks_exists)
     {

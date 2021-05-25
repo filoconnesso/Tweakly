@@ -1,6 +1,6 @@
 /*
 *
-*  TICK TIMER EXAMPLE FOR ARDUINO TWEAKLY
+*  TICK TIMER EXAMPLE FOR TWEAKLY
 *  Created By Mirko Pacioni
 *
 */
