@@ -22,6 +22,7 @@ digitalSwitchButton	KEYWORD2
 playTick	KEYWORD2
 tickIsRunning	KEYWORD2
 digitalWriteClass	KEYWORD2
+encoderAttach		KEYWORD2
 
 #######################################
 # Constants
