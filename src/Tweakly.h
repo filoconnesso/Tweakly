@@ -8,9 +8,6 @@
 
 #include "Arduino.h"
 
-#ifndef nullptr
-#define nullptr NULL
-#endif
 
 typedef void (*_tick_callback)();
 typedef void (*_encoder_callback)(bool);
@@ -25,13 +22,13 @@ unsigned long _pin_encoder_default_debounce_millis = 1;
 
 struct _ticks
 {
-    char* _tick_name;
+    const char *_tick_name;
     unsigned long _tick_current_millis;
     unsigned long _tick_delay;
     unsigned long _tick_previous_time;
     bool _tick_enabled;
     _tick_callback _tick_callback_function;
-    _ticks *_next_tick = nullptr;
+    _ticks *_next_tick = NULL;
 };
 
 struct _pins
@@ -44,16 +41,16 @@ struct _pins
     bool _pin_switch_status;
     bool _pin_switch_release_button;
     int _pin_mode;
-    char* _pin_class;
+    const char *_pin_class;
     unsigned long _pin_debounce_current_millis;
     unsigned long _pin_debounce_previous_millis;
     unsigned long _pin_debounce_delay_millis;
-    _pins *_next_pin = nullptr;
+    _pins *_next_pin = NULL;
 };
 
 struct _encoders
 {
-    char *_encoder_name;
+    const char *_encoder_name;
     int _encoder_dt_pin;
     int _encoder_clk_pin;
     bool _encoder_dt_pin_status;
@@ -63,20 +60,19 @@ struct _encoders
     unsigned long _encoder_debounce_previous_millis;
     unsigned long _encoder_debounce_delay_millis;
     _encoder_callback _encoder_change_callback;
-    _encoders *_next_encoder = nullptr;
+    _encoders *_next_encoder = NULL;
 };
 
-_ticks *_first_tick = nullptr, *_last_tick = nullptr;
-_pins *_first_pin = nullptr, *_last_pin = nullptr;
-_encoders *_first_encoder = nullptr, *_last_encoder = nullptr;
-
+_ticks *_first_tick = NULL, *_last_tick = NULL;
+_pins *_first_pin = NULL, *_last_pin = NULL;
+_encoders *_first_encoder = NULL, *_last_encoder = NULL;
 
 void encoderAttach(int _new_encoder_dt_pin, int _new_encoder_clk_pin, _encoder_callback _new_encoder_change_callback)
 {
     _encoders *_new_encoder = new _encoders;
     _new_encoder->_encoder_dt_pin = _new_encoder_dt_pin;
     _new_encoder->_encoder_clk_pin = _new_encoder_clk_pin;
-    if (_first_encoder == nullptr)
+    if (_first_encoder == NULL)
     {
         _first_encoder = _new_encoder;
     }
@@ -93,13 +89,14 @@ void encoderAttach(int _new_encoder_dt_pin, int _new_encoder_clk_pin, _encoder_c
     }
 }
 
-void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_status, char *_pin_class = "nope")
+void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_status, const char *_pin_class = "nope")
 {
     _pins *_new_pin = new _pins;
+    _pin_class = _pin_class;
     _new_pin->_pin_number = _new_pin_number;
     _new_pin->_pin_status = _new_pin_status;
     _new_pin->_pin_mode = _new_pin_mode;
-    if (_first_pin == nullptr)
+    if (_first_pin == NULL)
     {
         _first_pin = _new_pin;
     }
@@ -131,7 +128,7 @@ void digitalToggle(int _digital_pin)
 {
     if (_pad_exists)
     {
-        for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+        for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
         {
             if (_this_pin->_pin_number == _digital_pin && _this_pin->_pin_mode == OUTPUT)
             {
@@ -146,7 +143,7 @@ void digitalToggleAll()
 {
     if (_pad_exists)
     {
-        for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+        for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
         {
             if (_this_pin->_pin_mode == OUTPUT)
             {
@@ -161,7 +158,7 @@ void digitalWriteAll(int _digital_status)
 {
     if (_pad_exists)
     {
-        for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+        for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
         {
             if (_this_pin->_pin_mode == OUTPUT && _this_pin->_pin_status != _digital_status)
             {
@@ -171,13 +168,14 @@ void digitalWriteAll(int _digital_status)
         }
     }
 }
-void digitalWriteClass(char* _digital_pin_class, int _digital_status)
+
+void digitalWriteClass(const char *_digital_pin_class, int _digital_status)
 {
     if (_pad_exists)
     {
-        for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+        for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
         {
-            if (_this_pin->_pin_mode == OUTPUT && _this_pin->_pin_status != _digital_status && _this_pin->_pin_class == _digital_pin_class && _this_pin->_pin_class != "nope")
+            if (_this_pin->_pin_mode == OUTPUT && _this_pin->_pin_status != _digital_status && _this_pin->_pin_class == _digital_pin_class && strcmp(_this_pin->_pin_class, "nope"))
             {
                 _this_pin->_pin_status = _digital_status;
                 digitalWrite(_this_pin->_pin_number, _this_pin->_pin_status);
@@ -190,7 +188,7 @@ bool digitalPushButton(int _digital_pin)
 {
     if (_pad_exists)
     {
-        for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+        for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
         {
             if (_this_pin->_pin_mode != OUTPUT)
             {
@@ -201,13 +199,14 @@ bool digitalPushButton(int _digital_pin)
             }
         }
     }
+    return 0;
 }
 
 bool digitalSwitchButton(int _digital_pin)
 {
     if (_pad_exists)
     {
-        for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+        for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
         {
             if (_this_pin->_pin_mode != OUTPUT)
             {
@@ -218,15 +217,16 @@ bool digitalSwitchButton(int _digital_pin)
             }
         }
     }
+    return 0;
 }
 
-void setTick(char* _new_tick_name, unsigned long _new_tick_delay, _tick_callback _new_tick_callback)
+void setTick(const char *_new_tick_name, unsigned long _new_tick_delay, _tick_callback _new_tick_callback)
 {
     _ticks *_new_tick = new _ticks;
     _new_tick->_tick_name = _new_tick_name;
     _new_tick->_tick_delay = _new_tick_delay;
     _new_tick->_tick_callback_function = _new_tick_callback;
-    if (_first_tick == nullptr)
+    if (_first_tick == NULL)
     {
         _first_tick = _new_tick;
     }
@@ -243,11 +243,11 @@ void setTick(char* _new_tick_name, unsigned long _new_tick_delay, _tick_callback
     }
 }
 
-void pauseTick(char* _tick_name)
+void pauseTick(const char *_tick_name)
 {
     if (_ticks_exists)
     {
-        for (_ticks *_this_tick = _first_tick; _this_tick != nullptr; _this_tick = _this_tick->_next_tick)
+        for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick)
         {
             if (_this_tick->_tick_name == _tick_name)
             {
@@ -257,11 +257,11 @@ void pauseTick(char* _tick_name)
     }
 }
 
-void playTick(char* _tick_name)
+void playTick(const char *_tick_name)
 {
     if (_ticks_exists)
     {
-        for (_ticks *_this_tick = _first_tick; _this_tick != nullptr; _this_tick = _this_tick->_next_tick)
+        for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick)
         {
             if (_this_tick->_tick_name == _tick_name)
             {
@@ -271,11 +271,12 @@ void playTick(char* _tick_name)
     }
 }
 
-bool tickIsRunning(char* _tick_name)
+bool tickIsRunning(const char* _tick_name)
 {
+    _tick_name = _tick_name;
     if (_ticks_exists)
     {
-        for (_ticks *_this_tick = _first_tick; _this_tick != nullptr; _this_tick = _this_tick->_next_tick)
+        for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick)
         {
             if (!_this_tick->_tick_enabled)
             {
@@ -287,6 +288,7 @@ bool tickIsRunning(char* _tick_name)
             }
         }
     }
+    return 0;
 }
 
 void TweaklyRun()
@@ -296,14 +298,14 @@ void TweaklyRun()
     {
         if (_ticks_exists)
         {
-            for (_ticks *_this_tick = _first_tick; _this_tick != nullptr; _this_tick = _this_tick->_next_tick)
+            for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick)
             {
                 _this_tick->_tick_previous_time = _current_millis;
             }
         }
         if (_pad_exists)
         {
-            for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+            for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
             {
                 if (_this_pin->_pin_mode != OUTPUT)
                 {
@@ -313,7 +315,7 @@ void TweaklyRun()
         }
         if (_encoder_exists)
         {
-            for (_encoders *_this_encoder = _first_encoder; _this_encoder != nullptr; _this_encoder = _this_encoder->_next_encoder)
+            for (_encoders *_this_encoder = _first_encoder; _this_encoder != NULL; _this_encoder = _this_encoder->_next_encoder)
             {
 
                 _this_encoder->_encoder_debounce_previous_millis = _current_millis;
@@ -326,7 +328,7 @@ void TweaklyRun()
     {
         if (_ticks_exists)
         {
-            for (_ticks *_this_tick = _first_tick; _this_tick != nullptr; _this_tick = _this_tick->_next_tick)
+            for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick)
             {
                 if (_this_tick->_tick_enabled)
                 {
@@ -341,7 +343,7 @@ void TweaklyRun()
         }
         if (_pad_exists)
         {
-            for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
+            for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin)
             {
                 if (_this_pin->_pin_mode != OUTPUT)
                 {
@@ -368,7 +370,7 @@ void TweaklyRun()
         }
         if (_encoder_exists)
         {
-            for (_encoders *_this_encoder = _first_encoder; _this_encoder != nullptr; _this_encoder = _this_encoder->_next_encoder)
+            for (_encoders *_this_encoder = _first_encoder; _this_encoder != NULL; _this_encoder = _this_encoder->_next_encoder)
             {
                 _this_encoder->_encoder_debounce_current_millis = _current_millis;
                 if (_this_encoder->_encoder_debounce_current_millis - _this_encoder->_encoder_debounce_previous_millis > _this_encoder->_encoder_debounce_delay_millis)
