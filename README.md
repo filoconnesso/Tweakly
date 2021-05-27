@@ -15,6 +15,12 @@
 10. digitalWriteAll
 11. digitalWriteClass
 12. encoderAttach
+13. analogPadMode
+14. analogWriteAll
+15. analogWriteClass
+16. analogFade
+17. analogEnable
+18. analogDisable
 # Information
 Tweakly allows you to create dynamic code, using programming methods that are normally difficult to implement, allowing the user to reduce the writing of the code as much as possible to allow the latter to concentrate on the project to be implemented.
 # Other
