@@ -18,7 +18,7 @@
 13. analogPadMode
 14. analogWriteAll
 15. analogWriteClass
-16. analogFade
+16. analogWriteFade
 17. analogEnable
 18. analogDisable
 # Information
