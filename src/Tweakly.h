@@ -38,6 +38,7 @@ struct _ticks
 
 struct _pins
 {
+    const char *_pin_class;
     int _pin_number;
     bool _pin_status;
     bool _pin_previous_status;
@@ -46,7 +47,6 @@ struct _pins
     bool _pin_switch_status;
     bool _pin_switch_release_button;
     int _pin_mode;
-    const char *_pin_class;
     unsigned long _pin_debounce_current_millis;
     unsigned long _pin_debounce_previous_millis;
     unsigned long _pin_debounce_delay_millis;
