@@ -557,3 +557,33 @@ void TweaklyRun()
         }
     }
 }
+
+//-------------------------------------------------------------------------------------------------------------------------//
+/* Warning!
+ * These two functions must be the last ones defined in the library. So, at compiler time is it possible to "override"
+ * some Arduino core functions. It is not a good way to approch this problem but we love porcate. 
+ * Please don't judge us.
+ */
+// NOTE: this function "overrides" digitalWrite. 
+void myDigitalWrite(uint8_t _pin, uint8_t _state){
+  //same stuff done in digitalToggle
+  if (_pad_exists){
+    for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin){
+      if (_this_pin->_pin_number == _pin && _this_pin->_pin_mode == OUTPUT){
+        _this_pin->_pin_status = _state; //copy state
+        digitalWrite(_this_pin->_pin_number, _this_pin->_pin_status); //apply original digitalWrite
+      }
+    }
+  }
+}
+#define digitalWrite myDigitalWrite
+// from this line original digitalWrite() from Arduino.h cannot be used anymore. Sorry T.T
+
+// NOTE: this function "overrides" pinMode, so you can use in transparent mode without any issues
+void myPinMode(uint8_t _pin, uint8_t _type){
+  padMode(_pin,_type,LOW); // When you use pinMode, you will always set LOW state as initial state
+}
+#define pinMode myPinMode
+// from this line original pinMode() from Arduino.h cannot be used anymore. Sorry T.T
+//-------------------------------------------------------------------------------------------------------------------------//
+
