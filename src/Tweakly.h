@@ -8,7 +8,6 @@
 
 #include "Arduino.h"
 
-
 #define OUT 1
 #define IN 2
 #define ALWAYS 3
@@ -56,6 +55,7 @@ struct _pins
 
 struct _pwm_pins
 {
+    const char *_pwm_pin_class;
     int _pwm_pin_number;
     unsigned int _pwm_pin_value;
     unsigned long _pwm_pin_delay_current_millis;
@@ -63,7 +63,6 @@ struct _pwm_pins
     bool _pwm_pin_fade_direction;
     unsigned long _pwm_max_value;
     unsigned long _pwm_min_value;
-    char *_pwm_pin_class;
     bool _pwm_pin_enabled;
     _pwm_pins *_next_pwm_pin = NULL;
 };
@@ -252,7 +251,7 @@ void analogEnable(int _pwm_pin_number, unsigned int _pwm_pin_value = 0)
     {
         for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != NULL; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
         {
-            if (!_this_pwm_pin->_pwm_pin_enabled)
+            if (_this_pwm_pin->_pwm_pin_number == _pwm_pin_number && !_this_pwm_pin->_pwm_pin_enabled)
             {
                 _this_pwm_pin->_pwm_pin_value = _pwm_pin_value;
                 _this_pwm_pin->_pwm_pin_enabled = true;
@@ -267,7 +266,7 @@ void analogDisable(int _pwm_pin_number)
     {
         for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != NULL; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
         {
-            if (_this_pwm_pin->_pwm_pin_enabled)
+            if (_this_pwm_pin->_pwm_pin_number == _pwm_pin_number && _this_pwm_pin->_pwm_pin_enabled)
             {
                 _this_pwm_pin->_pwm_pin_enabled = false;
             }
