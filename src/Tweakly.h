@@ -12,6 +12,10 @@
 #define nullptr NULL
 #endif
 
+#define OUT 1
+#define IN 2
+#define ALWAYS 3
+
 typedef void (*_tick_callback)();
 typedef void (*_encoder_callback)(bool);
 
@@ -19,13 +23,15 @@ bool _tweakly_ready = false;
 bool _ticks_exists = false;
 bool _pad_exists = false;
 bool _encoder_exists = false;
+bool _pwm_pad_exists = false;
 
 unsigned long _pin_button_default_debounce_millis = 50;
 unsigned long _pin_encoder_default_debounce_millis = 1;
+unsigned long _pin_pwm_default_delay_millis = 0;
 
 struct _ticks
 {
-    char* _tick_name;
+    char *_tick_name;
     unsigned long _tick_current_millis;
     unsigned long _tick_delay;
     unsigned long _tick_previous_time;
@@ -44,11 +50,25 @@ struct _pins
     bool _pin_switch_status;
     bool _pin_switch_release_button;
     int _pin_mode;
-    char* _pin_class;
+    char *_pin_class;
     unsigned long _pin_debounce_current_millis;
     unsigned long _pin_debounce_previous_millis;
     unsigned long _pin_debounce_delay_millis;
     _pins *_next_pin = nullptr;
+};
+
+struct _pwm_pins
+{
+    int _pwm_pin_number;
+    unsigned int _pwm_pin_value;
+    unsigned long _pwm_pin_delay_current_millis;
+    unsigned long _pwm_pin_delay_previous_millis;
+    bool _pwm_pin_fade_direction;
+    unsigned long _pwm_max_value;
+    unsigned long _pwm_min_value;
+    char *_pwm_pin_class;
+    bool _pwm_pin_enabled;
+    _pwm_pins *_next_pwm_pin = nullptr;
 };
 
 struct _encoders
@@ -69,7 +89,7 @@ struct _encoders
 _ticks *_first_tick = nullptr, *_last_tick = nullptr;
 _pins *_first_pin = nullptr, *_last_pin = nullptr;
 _encoders *_first_encoder = nullptr, *_last_encoder = nullptr;
-
+_pwm_pins *_first_pwm_pin = nullptr, *_last_pwm_pin = nullptr;
 
 void encoderAttach(int _new_encoder_dt_pin, int _new_encoder_clk_pin, _encoder_callback _new_encoder_change_callback)
 {
@@ -127,6 +147,32 @@ void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_st
     }
 }
 
+void analogPadMode(uint8_t _new_pwm_pin_number, uint8_t _new_pwm_pin_start_value, uint8_t _new_pwm_pin_min, uint8_t _new_pwm_pin_max, char *_pin_class = "nope")
+{
+    _pwm_pins *_new_pwm_pin = new _pwm_pins;
+    _new_pwm_pin->_pwm_pin_number = _new_pwm_pin_number;
+    if (_first_pwm_pin == nullptr)
+    {
+        _first_pwm_pin = _new_pwm_pin;
+    }
+    else
+    {
+        _last_pwm_pin->_next_pwm_pin = _new_pwm_pin;
+    }
+    pinMode(_new_pwm_pin_number, OUTPUT);
+    _last_pwm_pin = _new_pwm_pin;
+    _new_pwm_pin->_pwm_pin_class = _pin_class;
+    _new_pwm_pin->_pwm_pin_value = _new_pwm_pin_start_value;
+    _new_pwm_pin->_pwm_min_value = _new_pwm_pin_min;
+    _new_pwm_pin->_pwm_max_value = _new_pwm_pin_max;
+    _new_pwm_pin->_pwm_pin_fade_direction = false;
+    _new_pwm_pin->_pwm_pin_enabled = true;
+    if (!_pwm_pad_exists)
+    {
+        _pwm_pad_exists = true;
+    }
+}
+
 void digitalToggle(int _digital_pin)
 {
     if (_pad_exists)
@@ -171,7 +217,8 @@ void digitalWriteAll(int _digital_status)
         }
     }
 }
-void digitalWriteClass(char* _digital_pin_class, int _digital_status)
+
+void digitalWriteClass(char *_digital_pin_class, int _digital_status)
 {
     if (_pad_exists)
     {
@@ -181,6 +228,120 @@ void digitalWriteClass(char* _digital_pin_class, int _digital_status)
             {
                 _this_pin->_pin_status = _digital_status;
                 digitalWrite(_this_pin->_pin_number, _this_pin->_pin_status);
+            }
+        }
+    }
+}
+
+void analogWriteAll(int _analog_status)
+{
+    if (_pwm_pad_exists)
+    {
+        for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != nullptr; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
+        {
+            if (_this_pwm_pin->_pwm_pin_enabled && _this_pwm_pin->_pwm_pin_value != _analog_status)
+            {
+                _this_pwm_pin->_pwm_pin_value = _analog_status;
+                analogWrite(_this_pwm_pin->_pwm_pin_number, _this_pwm_pin->_pwm_pin_value);
+            }
+        }
+    }
+}
+
+void analogEnable(int _pwm_pin_number, unsigned int _pwm_pin_value = 0)
+{
+    if (_pwm_pad_exists)
+    {
+        for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != nullptr; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
+        {
+            if (!_this_pwm_pin->_pwm_pin_enabled)
+            {
+                _this_pwm_pin->_pwm_pin_value = _pwm_pin_value;
+                _this_pwm_pin->_pwm_pin_enabled = true;
+            }
+        }
+    }
+}
+
+void analogDisable(int _pwm_pin_number)
+{
+    if (_pwm_pad_exists)
+    {
+        for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != nullptr; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
+        {
+            if (_this_pwm_pin->_pwm_pin_enabled)
+            {
+                _this_pwm_pin->_pwm_pin_enabled = false;
+            }
+        }
+    }
+}
+
+void analogWriteClass(char *_pwm_pin_class, int _analog_status)
+{
+    if (_pwm_pad_exists)
+    {
+        for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != nullptr; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
+        {
+            if (_this_pwm_pin->_pwm_pin_enabled && _this_pwm_pin->_pwm_pin_value != _analog_status && _this_pwm_pin->_pwm_pin_class == _pwm_pin_class && _this_pwm_pin->_pwm_pin_class != "nope")
+            {
+                _this_pwm_pin->_pwm_pin_value = _analog_status;
+                analogWrite(_this_pwm_pin->_pwm_pin_number, _this_pwm_pin->_pwm_pin_value);
+            }
+        }
+    }
+}
+
+void analogWriteFade(int _pwn_pin_number, unsigned long _delay, int _pwm_fade_mode)
+{
+    if (_pwm_pad_exists)
+    {
+        for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != nullptr; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
+        {
+            if (_this_pwm_pin->_pwm_pin_enabled == true && _this_pwm_pin->_pwm_pin_number == _pwn_pin_number && _delay >= 0)
+            {
+                unsigned long _current_millis = millis();
+                _this_pwm_pin->_pwm_pin_delay_current_millis = _current_millis;
+                if (_this_pwm_pin->_pwm_pin_delay_current_millis - _this_pwm_pin->_pwm_pin_delay_previous_millis > _delay)
+                {
+                    switch (_pwm_fade_mode)
+                    {
+                    case ALWAYS:
+                        if (!_this_pwm_pin->_pwm_pin_fade_direction)
+                        {
+                            _this_pwm_pin->_pwm_pin_value++;
+                            if (_this_pwm_pin->_pwm_pin_value == _this_pwm_pin->_pwm_max_value)
+                            {
+                                _this_pwm_pin->_pwm_pin_fade_direction = true;
+                            }
+                        }
+                        if (_this_pwm_pin->_pwm_pin_fade_direction)
+                        {
+                            _this_pwm_pin->_pwm_pin_value--;
+                            if (_this_pwm_pin->_pwm_pin_value == _this_pwm_pin->_pwm_min_value)
+                            {
+                                _this_pwm_pin->_pwm_pin_fade_direction = false;
+                            }
+                        }
+                        break;
+                    case IN:
+                        _this_pwm_pin->_pwm_pin_value++;
+                        if (_this_pwm_pin->_pwm_pin_value == _this_pwm_pin->_pwm_max_value)
+                        {
+                            _this_pwm_pin->_pwm_pin_enabled = false;
+                        }
+                        break;
+                    case OUT:
+                        _this_pwm_pin->_pwm_pin_value--;
+                        if (_this_pwm_pin->_pwm_pin_value == _this_pwm_pin->_pwm_min_value)
+                        {
+                            _this_pwm_pin->_pwm_pin_enabled = false;
+                        }
+                        break;
+                    }
+                    analogWrite(_this_pwm_pin->_pwm_pin_number, _this_pwm_pin->_pwm_pin_value);
+                    _this_pwm_pin->_pwm_pin_delay_previous_millis = _this_pwm_pin->_pwm_pin_delay_current_millis;
+                }
             }
         }
     }
@@ -220,7 +381,7 @@ bool digitalSwitchButton(int _digital_pin)
     }
 }
 
-void setTick(char* _new_tick_name, unsigned long _new_tick_delay, _tick_callback _new_tick_callback)
+void setTick(char *_new_tick_name, unsigned long _new_tick_delay, _tick_callback _new_tick_callback)
 {
     _ticks *_new_tick = new _ticks;
     _new_tick->_tick_name = _new_tick_name;
@@ -243,7 +404,7 @@ void setTick(char* _new_tick_name, unsigned long _new_tick_delay, _tick_callback
     }
 }
 
-void pauseTick(char* _tick_name)
+void pauseTick(char *_tick_name)
 {
     if (_ticks_exists)
     {
@@ -257,7 +418,7 @@ void pauseTick(char* _tick_name)
     }
 }
 
-void playTick(char* _tick_name)
+void playTick(char *_tick_name)
 {
     if (_ticks_exists)
     {
@@ -271,7 +432,7 @@ void playTick(char* _tick_name)
     }
 }
 
-bool tickIsRunning(char* _tick_name)
+bool tickIsRunning(char *_tick_name)
 {
     if (_ticks_exists)
     {
@@ -311,6 +472,16 @@ void TweaklyRun()
                 }
             }
         }
+        if (_pwm_pad_exists)
+        {
+            for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != nullptr; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin)
+            {
+                if (_this_pwm_pin->_pwm_pin_enabled)
+                {
+                    _this_pwm_pin->_pwm_pin_delay_current_millis = _current_millis;
+                }
+            }
+        }
         if (_encoder_exists)
         {
             for (_encoders *_this_encoder = _first_encoder; _this_encoder != nullptr; _this_encoder = _this_encoder->_next_encoder)
@@ -343,9 +514,9 @@ void TweaklyRun()
         {
             for (_pins *_this_pin = _first_pin; _this_pin != nullptr; _this_pin = _this_pin->_next_pin)
             {
+                _this_pin->_pin_debounce_current_millis = _current_millis;
                 if (_this_pin->_pin_mode != OUTPUT)
                 {
-                    _this_pin->_pin_debounce_current_millis = _current_millis;
                     _this_pin->_pin_status = digitalRead(_this_pin->_pin_number);
                     if (_this_pin->_pin_status != _this_pin->_pin_previous_status)
                     {
@@ -366,22 +537,22 @@ void TweaklyRun()
                 }
             }
         }
-        if (_encoder_exists)
+    }
+    if (_encoder_exists)
+    {
+        for (_encoders *_this_encoder = _first_encoder; _this_encoder != nullptr; _this_encoder = _this_encoder->_next_encoder)
         {
-            for (_encoders *_this_encoder = _first_encoder; _this_encoder != nullptr; _this_encoder = _this_encoder->_next_encoder)
+            _this_encoder->_encoder_debounce_current_millis = _current_millis;
+            if (_this_encoder->_encoder_debounce_current_millis - _this_encoder->_encoder_debounce_previous_millis > _this_encoder->_encoder_debounce_delay_millis)
             {
-                _this_encoder->_encoder_debounce_current_millis = _current_millis;
-                if (_this_encoder->_encoder_debounce_current_millis - _this_encoder->_encoder_debounce_previous_millis > _this_encoder->_encoder_debounce_delay_millis)
+                _this_encoder->_encoder_clk_pin_status = digitalRead(_this_encoder->_encoder_clk_pin);
+                _this_encoder->_encoder_debounce_previous_millis = _this_encoder->_encoder_debounce_current_millis;
+                if (_this_encoder->_encoder_clk_pin_status != _this_encoder->_encoder_clk_pin_previous_status && _this_encoder->_encoder_clk_pin_status == HIGH)
                 {
-                    _this_encoder->_encoder_clk_pin_status = digitalRead(_this_encoder->_encoder_clk_pin);
-                    _this_encoder->_encoder_debounce_previous_millis = _this_encoder->_encoder_debounce_current_millis;
-                    if (_this_encoder->_encoder_clk_pin_status != _this_encoder->_encoder_clk_pin_previous_status && _this_encoder->_encoder_clk_pin_status == HIGH)
-                    {
-                        _this_encoder->_encoder_dt_pin_status = digitalRead(_this_encoder->_encoder_dt_pin);
-                        _this_encoder->_encoder_change_callback(_this_encoder->_encoder_dt_pin_status);
-                    }
-                    _this_encoder->_encoder_clk_pin_previous_status = _this_encoder->_encoder_clk_pin_status;
+                    _this_encoder->_encoder_dt_pin_status = digitalRead(_this_encoder->_encoder_dt_pin);
+                    _this_encoder->_encoder_change_callback(_this_encoder->_encoder_dt_pin_status);
                 }
+                _this_encoder->_encoder_clk_pin_previous_status = _this_encoder->_encoder_clk_pin_status;
             }
         }
     }
