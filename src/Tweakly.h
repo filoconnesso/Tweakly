@@ -236,8 +236,8 @@ void analogWriteAll(unsigned int _analog_status){
   }
 }
 
-// analogEnable: attach a pin to the Tweakly core
-void analogEnable(uint8_t _pwm_pin_number, unsigned int _pwm_pin_value = 0){
+// analogAttach: attach a pin to the Tweakly core
+void analogAttach(uint8_t _pwm_pin_number, unsigned int _pwm_pin_value = 0){
   if (_pwm_pad_exists){
     for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != NULL; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin){
       if (_this_pwm_pin->_pwm_pin_number == _pwm_pin_number && !_this_pwm_pin->_pwm_pin_enabled){
@@ -248,8 +248,8 @@ void analogEnable(uint8_t _pwm_pin_number, unsigned int _pwm_pin_value = 0){
   }
 }
 
-// analogDisable: detach a pin from the Tweakly core
-void analogDisable(uint8_t _pwm_pin_number){
+// analogDetach: detach a pin from the Tweakly core
+void analogDetach(uint8_t _pwm_pin_number){
   if (_pwm_pad_exists){
     for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != NULL; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin){
       if (_this_pwm_pin->_pwm_pin_number == _pwm_pin_number && _this_pwm_pin->_pwm_pin_enabled){
