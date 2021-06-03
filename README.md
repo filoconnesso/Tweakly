@@ -22,6 +22,7 @@
 16. analogWriteFade
 17. analogAttach
 18. analogDetach
+19. digitalToggleClass
 # Information
 Tweakly allows you to create dynamic code, using programming methods that are normally difficult to implement, allowing the user to reduce the writing of the code as much as possible to allow the latter to concentrate on the project to be implemented.
 # Other
