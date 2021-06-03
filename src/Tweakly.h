@@ -24,12 +24,17 @@
  * March 12th 2021
  */
 
-#include "Arduino.h"
+#ifndef TWEAKLY_H
+#define TWEAKLY_H
+
+#include <Arduino.h>
 
 // Definitions for analogWriteFade
 #define OUT    1                // -> falling effect
 #define IN     2                // -> rising effect
 #define ALWAYS 3                // -> pulsing effect
+
+#define PWM_OUTPUT 169
 
 typedef void (*_tick_callback)();
 typedef void (*_encoder_callback)(bool);
@@ -486,7 +491,7 @@ void TweaklyRun(){
  * Please don't judge us.
  */
 // NOTE: this function "overrides" digitalWrite. 
-void myDigitalWrite(uint8_t _pin, uint8_t _state){
+void TweaklyDigitalWrite(uint8_t _pin, uint8_t _state){
   //same stuff done in digitalToggle
   if (_pad_exists){
     for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin){
@@ -497,17 +502,37 @@ void myDigitalWrite(uint8_t _pin, uint8_t _state){
     }
   }
 }
-#define digitalWrite myDigitalWrite
+#define digitalWrite TweaklyDigitalWrite
 // from this line original digitalWrite() from Arduino.h cannot be used anymore. Sorry T.T
 
-// NOTE: this function "overrides" pinMode, so you can use in transparent mode without any issues
-void myPinMode(uint8_t _pin, uint8_t _type){
-  padMode(_pin,_type,LOW); // When you use pinMode, you will always set LOW state as initial state
+// NOTE: this function "overrides" analogWrite. 
+void TweaklyAnalogWrite(uint8_t _pin, uint8_t _analog_status){
+   if (_pwm_pad_exists){
+    for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != NULL; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin){
+      if (_this_pwm_pin->_pwm_pin_enabled && _this_pwm_pin->_pwm_pin_value != _analog_status && _this_pwm_pin->_pwm_pin_number == _pin){
+        _this_pwm_pin->_pwm_pin_value = _analog_status; //updates the analog pin value
+        analogWrite(_this_pwm_pin->_pwm_pin_number, _this_pwm_pin->_pwm_pin_value);
+      }
+    }
+  }
 }
-#define pinMode myPinMode
+#define analogWrite TweaklyAnalogWrite
+// from this line original AnalogWrite() from Arduino.h cannot be used anymore. Sorry T.T (Mirko)
+
+// NOTE: this function "overrides" pinMode, so you can use in transparent mode without any issues
+void TweaklyPinMode(uint8_t _pin, uint8_t _type, uint8_t _pin_start_value = 0, char* _pin_class = "nope", uint8_t _pwm_pin_min_value = 0, uint8_t _pwm_pin_max_value = 255){
+  if(_type == PWM_OUTPUT) {
+    analogPadMode(_pin, _pin_start_value, _pwm_pin_min_value, _pwm_pin_max_value, _pin_class);
+  } else {
+    if(_pin_start_value > 1) {
+      _pin_start_value = 1; //if the pin is set as digital pin and the initial value is greater than 1 it brings the initial value to 1 
+    }
+    padMode(_pin, _type, _pin_start_value, _pin_class); // When you use pinMode, you will always set LOW state as initial state
+  }
+}
+#define pinMode TweaklyPinMode
 // from this line original pinMode() from Arduino.h cannot be used anymore. Sorry T.T
 //-------------------------------------------------------------------------------------------------------------------------//
-
 
 // Comments added by G.Bruno (@gbr1) on May 28th 2021
 
@@ -553,3 +578,5 @@ void myPinMode(uint8_t _pin, uint8_t _type){
 ####################################################################################################
 ####################################################################################################
 */
+
+#endif
