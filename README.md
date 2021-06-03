@@ -2,6 +2,7 @@
 1. Add no-blocking Timer Ticker on Wiring code!
 2. Delete the boucing
 3. Add the special features for the pins
+4. Now you can use Tweakly on old sketches and take advantage of the pinMode, digitalWrite and analogWrite functions.
 # Functions included
 1. setTick
 2. playTick
