@@ -160,7 +160,7 @@ void padMode(uint8_t _new_pin_number, uint8_t _new_pin_mode, uint8_t _new_pin_st
 }
 
 // analogPadMode: inizialize a pwm pin
-void analogPadMode(uint8_t _new_pwm_pin_number, uint8_t _new_pwm_pin_start_value, uint8_t _new_pwm_pin_min, uint8_t _new_pwm_pin_max, char *_pin_class = "nope"){
+void analogPadMode(uint8_t _new_pwm_pin_number, uint8_t _new_pwm_pin_start_value, uint8_t _new_pwm_pin_min, uint8_t _new_pwm_pin_max, const char *_pin_class = "nope"){
   _pwm_pins *_new_pwm_pin = new _pwm_pins;
   _new_pwm_pin->_pwm_pin_number = _new_pwm_pin_number;
   if (_first_pwm_pin == NULL){
@@ -205,6 +205,18 @@ void digitalToggleAll(){
   }
 }
 
+// digitalToggleClass: toggle the state to class of pins
+void digitalToggleClass(const char *_digital_pin_class){
+  if (_pad_exists){
+    for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin){
+      if (_this_pin->_pin_mode == OUTPUT && strcmp(_this_pin->_pin_class,_digital_pin_class)){
+        _this_pin->_pin_status = !_this_pin->_pin_status;
+        digitalWrite(_this_pin->_pin_number, _this_pin->_pin_status);
+      }
+    }
+  }
+}
+
 // digitalWriteAll: set all digital pins to a value
 void digitalWriteAll(uint8_t _digital_status){
   if (_pad_exists){
@@ -221,7 +233,7 @@ void digitalWriteAll(uint8_t _digital_status){
 void digitalWriteClass(const char *_digital_pin_class, uint8_t _digital_status){
   if (_pad_exists){
     for (_pins *_this_pin = _first_pin; _this_pin != NULL; _this_pin = _this_pin->_next_pin){
-      if (_this_pin->_pin_mode == OUTPUT && _this_pin->_pin_status != _digital_status && _this_pin->_pin_class == _digital_pin_class && strcmp(_this_pin->_pin_class, "nope")){
+      if (_this_pin->_pin_mode == OUTPUT && _this_pin->_pin_status != _digital_status && strcmp(_this_pin->_pin_class,_digital_pin_class)){
         _this_pin->_pin_status = _digital_status;
         digitalWrite(_this_pin->_pin_number, _this_pin->_pin_status);
       }
@@ -268,7 +280,7 @@ void analogDetach(uint8_t _pwm_pin_number){
 void analogWriteClass(char *_pwm_pin_class, unsigned int _analog_status){
   if (_pwm_pad_exists){
     for (_pwm_pins *_this_pwm_pin = _first_pwm_pin; _this_pwm_pin != NULL; _this_pwm_pin = _this_pwm_pin->_next_pwm_pin){
-      if (_this_pwm_pin->_pwm_pin_enabled && _this_pwm_pin->_pwm_pin_value != _analog_status && _this_pwm_pin->_pwm_pin_class == _pwm_pin_class && _this_pwm_pin->_pwm_pin_class != "nope"){
+      if (_this_pwm_pin->_pwm_pin_enabled && _this_pwm_pin->_pwm_pin_value != _analog_status && strcmp(_this_pwm_pin->_pwm_pin_class,_pwm_pin_class)){
         _this_pwm_pin->_pwm_pin_value = _analog_status;
         analogWrite(_this_pwm_pin->_pwm_pin_number, _this_pwm_pin->_pwm_pin_value);
       }
@@ -520,7 +532,7 @@ void TweaklyAnalogWrite(uint8_t _pin, uint8_t _analog_status){
 // from this line original AnalogWrite() from Arduino.h cannot be used anymore. Sorry T.T (Mirko)
 
 // NOTE: this function "overrides" pinMode, so you can use in transparent mode without any issues
-void TweaklyPinMode(uint8_t _pin, uint8_t _type, uint8_t _pin_start_value = 0, char* _pin_class = "nope", uint8_t _pwm_pin_min_value = 0, uint8_t _pwm_pin_max_value = 255){
+void TweaklyPinMode(uint8_t _pin, uint8_t _type, uint8_t _pin_start_value = 0, const char* _pin_class = "nope", uint8_t _pwm_pin_min_value = 0, uint8_t _pwm_pin_max_value = 255){
   if(_type == PWM_OUTPUT) {
     analogPadMode(_pin, _pin_start_value, _pwm_pin_min_value, _pwm_pin_max_value, _pin_class);
   } else {
