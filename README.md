@@ -1,4 +1,4 @@
-# DESCLAIMER :
+# DISCLAIMER :
 This library for Arduino is a project under development that can change according to the developer's choices, keep in mind that if you want to create a project with this library you may be forced to change the setting of your project in a few months. For the moment we recommend that you only use the library for unimportant projects and keep up to date via this GitHub page to follow the updates. 
 # Tweakly For Wiring
 1. Add no-blocking Tick Timer on Wiring code!
