@@ -1,4 +1,4 @@
-# NEW VERSION IS HERE!!
+# THE NEW VERSION IS HERE!!
 In this new version of Tweakly is full of news! Find a new Pad and TickTimer management system, plus new code simplification tools such as task lists and input hunters have been added. 
 # Tweakly For Wiring
 1. Add no-blocking Timer Ticker on Wiring code!
