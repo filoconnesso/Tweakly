@@ -6,24 +6,60 @@
 
 Tweakly	KEYWORD1
 TweaklyRun	KEYWORD1
+tweakly	KEYWORD1
+Pad	KEYWORD1
+TickTimer	KEYWORD1
+doList	KEYWORD1
+inputHunter	KEYWORD1
 
 #######################################
 # Methods and Functions 
 #######################################	
 
-setTick	KEYWORD2
-padMode	KEYWORD2
-digitalToggle	KEYWORD2
 digitalToggleAll	KEYWORD2
 digitalWriteAll	KEYWORD2
-pauseTick	KEYWORD2
 digitalPushButton	KEYWORD2
 digitalSwitchButton	KEYWORD2
-playTick	KEYWORD2
-tickIsRunning	KEYWORD2
 digitalWriteClass	KEYWORD2
 encoderAttach		KEYWORD2
+analogWriteAll	KEYWORD2
+analogWriteClass	KEYWORD2
+analogWriteProgressive	KEYWORD2
+analogEnable	KEYWORD2
+analogDisable	KEYWORD2
+analogAttach	KEYWORD2
+analogDetach	KEYWORD2
+digitalToggleClass	KEYWORD2
+toggle	KEYWORD2
+write	KEYWORD2
+read	KEYWORD2
+on	KEYWORD2
+off	KEYWORD2
+pinNumber	KEYWORD2
+attach	KEYWORD2
+pause	KEYWORD2
+play	KEYWORD2
+isPaused	KEYWORD2
+addTask		KEYWORD2
+next		KEYWORD2
+lock		KEYWORD2
+unlock		KEYWORD2
+assign		KEYWORD2
+recognition	KEYWORD2
 
 #######################################
 # Constants
 #######################################
+
+TO_HIGH	LITERAL1
+TO_LOW	LITERAL1
+TO_PULSE	LITERAL1
+LOW_TO_EDGE	LITERAL1
+HIGH_TO_EDGE	LITERAL1
+PULSE_TO_EDGE	LITERAL1
+PWM_MAX	LITERAL1
+PWM_MIN	LITERAL1
+PWM_OUTPUT	LITERAL1
+ANALOG_INPUT	LITERAL1
+LOCK	LITERAL1
+UNLOCK	LITERAL1
