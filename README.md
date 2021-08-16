@@ -118,7 +118,7 @@ Use Echo Stream to print to file and Serial :
    ```
 ## Demo
 
-[![Watch the video](https://img.youtube.com/vi/nspS5Prc-5I/maxresdefault.jpg)](https://youtu.be/nspS5Prc-5I)
+[![Watch the video](https://img.youtube.com/vi/nspS5Prc-5I/hqdefault.jpg)](https://youtu.be/nspS5Prc-5I)
 
 In this video the first green LED flashes with a 250ms timer, the red LED flashes at 1000ms and the blue LED at 1500ms. The last two red LEDs have a pwm control.
 
