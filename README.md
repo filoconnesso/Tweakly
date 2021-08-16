@@ -100,7 +100,7 @@ Code : https://create.arduino.cc/editor/filoconnesso/0347b6f1-775b-4f70-bb65-e5f
 
 ## Let's create a community 
 
-If you use Tweakly to create a project, tag us on Instagram and Twitter with the tag **@filoconnesso** and use the hashtag **#createwithtweakly**. If you like the project don't forget to leave a star on GitHub and if you have tips and tricks to improve Tweakly create a Pull Request, we will try to accommodate you! 
+If you use Tweakly to create a project, tag us on Instagram and Twitter with the tag **@filoconnesso** and use the hashtag **#createdwithtweakly**. If you like the project don't forget to leave a star on GitHub and if you have tips and tricks to improve Tweakly create a Pull Request, we will try to accommodate you! 
 
 ## Contributing
 
