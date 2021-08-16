@@ -95,7 +95,9 @@ Use stringAssembler to assemble strings and format a dataset together:
    int sensor_value;
    char sensor_name;
    
-   String message = stringAssembler("your sensor %s has read $d C° \n", sensor_name, sensor_value);
+   ...
+   
+   String message = stringAssembler("your sensor %s has read %d C° \n", sensor_name, sensor_value);
    ```
 Use Echo Stream to print to file and Serial :
    ```cpp
