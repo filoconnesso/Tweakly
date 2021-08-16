@@ -84,6 +84,29 @@ And your led will start blinking without blocking your code! Is not it fantastic
 
 _For more feature, please see the [Examples Folder](https://github.com/filoconnesso/Tweakly/tree/main/examples)_
 
+## Tricks
+
+Use a fast baud rate to not affect the performance of your code: 
+   ```cpp
+   Serial.begin(115200);
+   ```
+Use stringAssembler to assemble strings and format a dataset together: 
+   ```cpp
+   int sensor_value;
+   char sensor_name;
+   
+   String message = stringAssembler("your sensor %s has read $d C° \n", sensor_name, sensor_value);
+   ```
+Use Echo Stream to print to file and Serial :
+   ```cpp
+   Echo printer;
+   ```
+   ```cpp
+   Serial.begin(115200);
+   
+   printer.attach(&Serial);
+   printer.print("Hello, Friend \n");
+   ```
 ## Demo
 
 [![Watch the video](https://img.youtube.com/vi/nspS5Prc-5I/maxresdefault.jpg)](https://youtu.be/nspS5Prc-5I)
