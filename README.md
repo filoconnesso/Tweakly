@@ -26,6 +26,11 @@
 [![License](https://img.shields.io/badge/License-GPL_3.0-blue)](#license)
 [![issues - Tweakly](https://img.shields.io/github/issues/filoconnesso/Tweakly)](https://github.com/filoconnesso/Tweakly/issues)
 
+[![Arduino Lint Passed](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![Arduino Boards Compatible](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![ESP8266 Compatible](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![ESP32 Compatible](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+
 ## About The Project
 
 **Tweakly** allows you to create dynamic code, **using programming methods that are normally difficult to implement**, allowing the user to reduce the writing of the code as much as possible to allow the latter to concentrate on the project to be implemented.
