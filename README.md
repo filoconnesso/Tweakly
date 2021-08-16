@@ -147,7 +147,7 @@ Contributions are what make the open source community such an amazing place to b
 
 Released under [GPL](/LICENSE) by [@filoconnesso](https://github.com/filoconnesso).
 
-Distributed under the open source GPL v.3.0 license. Read the license [Examples Folder](https://github.com/filoconnesso/Tweakly/blob/main/LICENSE).
+Distributed under the open source GPL v.3.0 license. Read the license [here](https://github.com/filoconnesso/Tweakly/blob/main/LICENSE).
 
 In short :
 
