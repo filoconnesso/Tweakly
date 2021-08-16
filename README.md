@@ -30,7 +30,7 @@
 [![Arduino Lint Passed](https://img.shields.io/badge/Arduino%20Lint%20Passed-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 [![Arduino Boards Compatible](https://img.shields.io/badge/Arduino%20Boards%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 [![ESP8266 Compatible](https://img.shields.io/badge/ESP8266%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
-[![ESP32 Compatible](https://img.shields.io/badge/ESP32%20Compatble-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
+[![ESP32 Compatible](https://img.shields.io/badge/ESP32%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 
 ## About The Project
 
