@@ -1,4 +1,3 @@
-
 <br />
 <p align="center">
   <a href="https://github.com/filoconnesso/Tweakly/">
@@ -26,10 +25,7 @@
 [![GitHub tag](https://img.shields.io/github/tag/filoconnesso/Tweakly?include_prereleases=&sort=semver)](https://github.com/filoconnesso/Tweakly/releases/)
 [![License](https://img.shields.io/badge/License-GPL_3.0-blue)](#license)
 [![issues - Tweakly](https://img.shields.io/github/issues/filoconnesso/Tweakly)](https://github.com/filoconnesso/Tweakly/issues)
-  
-## License
 
-Released under [GPL](/LICENSE) by [@filoconnesso](https://github.com/filoconnesso).
 ## About The Project
 
 **Tweakly** allows you to create dynamic code, **using programming methods that are normally difficult to implement**, allowing the user to reduce the writing of the code as much as possible to allow the latter to concentrate on the project to be implemented.
@@ -111,6 +107,8 @@ Contributions are what make the open source community such an amazing place to b
 5. Open a Pull Request
 
 ## License
+
+Released under [GPL](/LICENSE) by [@filoconnesso](https://github.com/filoconnesso).
 
 Distributed under the open source GPL v.3.0 license. Read the license [Examples Folder](https://github.com/filoconnesso/Tweakly/blob/main/LICENSE).
 
