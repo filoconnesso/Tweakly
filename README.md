@@ -88,7 +88,7 @@ Initialize it in **setup()** with:
    ```
 And your led will start blinking without blocking your code! Is not it fantastic ?
 
-_For more feature, please see the [Examples Folder](https://github.com/filoconnesso/Tweakly/tree/main/examples)_
+_For more features, please see the [Examples Folder](https://github.com/filoconnesso/Tweakly/tree/main/examples)_
 
 ## Tricks
 
