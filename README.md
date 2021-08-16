@@ -26,11 +26,11 @@
 [![License](https://img.shields.io/badge/License-GPL_3.0-blue)](#license)
 [![issues - Tweakly](https://img.shields.io/github/issues/filoconnesso/Tweakly)](https://github.com/filoconnesso/Tweakly/issues)
 
-[![ESP32 Compatible](https://img.shields.io/badge/Supported-yes-green.svg)]()
-[![Arduino Lint Passed](https://img.shields.io/badge/Arduino%20Lint%20Passed-yes-green.svg)]()
-[![Arduino Boards Compatible](https://img.shields.io/badge/Arduino%20Boards%20Compatible-yes-green.svg)]()
-[![ESP8266 Compatible](https://img.shields.io/badge/ESP8266%20Compatible-yes-green.svg)]()
-[![ESP32 Compatible](https://img.shields.io/badge/ESP32%20Compatble-yes-green.svg)]()
+[![ESP32 Compatible](https://img.shields.io/badge/Supported-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
+[![Arduino Lint Passed](https://img.shields.io/badge/Arduino%20Lint%20Passed-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
+[![Arduino Boards Compatible](https://img.shields.io/badge/Arduino%20Boards%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
+[![ESP8266 Compatible](https://img.shields.io/badge/ESP8266%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
+[![ESP32 Compatible](https://img.shields.io/badge/ESP32%20Compatble-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 
 ## About The Project
 
