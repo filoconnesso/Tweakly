@@ -226,4 +226,3 @@ greater	LITERAL1
 lesser	LITERAL1
 greaterthanequal	LITERAL1
 lesserthanequal	LITERAL1
-progmem	LITERAL1
