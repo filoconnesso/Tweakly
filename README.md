@@ -28,6 +28,7 @@
 
 [![ESP32 Compatible](https://img.shields.io/badge/Supported-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 [![Arduino Lint Passed](https://img.shields.io/badge/Arduino%20Lint%20Passed-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
+[![Arduino Ide Library Manager](https://img.shields.io/badge/Arduino%20Ide%20Library%20Manager-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 [![Arduino Boards Compatible](https://img.shields.io/badge/Arduino%20Boards%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 [![ESP8266 Compatible](https://img.shields.io/badge/ESP8266%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
 [![ESP32 Compatible](https://img.shields.io/badge/ESP32%20Compatible-yes-green.svg)](https://github.com/filoconnesso/Tweakly)
@@ -117,7 +118,7 @@ Use Echo Stream to print to file and Serial :
    ```
 ## Demo
 
-[![Watch the video](https://img.youtube.com/vi/nspS5Prc-5I/maxresdefault.jpg)](https://youtu.be/nspS5Prc-5I)
+[![Watch the video](https://img.youtube.com/vi/nspS5Prc-5I/hqdefault.jpg)](https://youtu.be/nspS5Prc-5I)
 
 In this video the first green LED flashes with a 250ms timer, the red LED flashes at 1000ms and the blue LED at 1500ms. The last two red LEDs have a pwm control.
 
