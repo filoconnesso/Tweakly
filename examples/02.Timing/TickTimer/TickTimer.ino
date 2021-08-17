@@ -6,14 +6,14 @@
  */
  #include "Tweakly.h"
 
- //Create clock
- Clock myclock;
+ //Create timers
+ TickTimer timer;
 
  void setup() {
   //Start serial
   Serial.begin(115200);
   //Start timers
-  
+  timer.attach(500, [] { Serial.println("Hello, Friend!"); });
  }
 
  void loop() {
