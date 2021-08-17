@@ -16,6 +16,14 @@ Player	KEYWORD1
 Clock	KEYWORD1
 Pong	KEYWORD1
 
+####################################### 
+# Class colors for definitions
+#######################################
+
+console	KEYWORD1
+i2c	KEYWORD1
+sleep	KEYWORD1
+
 #######################################
 # Methods and Functions 
 #######################################	
@@ -208,3 +216,14 @@ NOTE_D8	LITERAL1
 NOTE_DS8	LITERAL1
 NOTE_END	LITERAL1
 
+#######################################
+# Constants for definitions
+#######################################
+
+same	LITERAL1
+differente	LITERAL1
+greater	LITERAL1
+lesser	LITERAL1
+greaterthanequal	LITERAL1
+lesserthanequal	LITERAL1
+progmem	LITERAL1
