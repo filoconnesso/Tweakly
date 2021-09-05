@@ -48,6 +48,10 @@ In development testing Tweakly was tested on:
 * ESP8266
 * ESP32
 
+### Documentation
+
+The Tweakly documentation is under development, it will be available in the coming months in Italian and English, in the meantime make use of the included examples and wait patiently :-)
+
 ### Installation
 
 1. From Arduino CLI
