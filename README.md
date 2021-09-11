@@ -52,6 +52,8 @@ In development testing Tweakly was tested on:
 
 The Tweakly documentation is under development, it will be available in the coming months in Italian and English, in the meantime make use of the included examples and wait patiently :-)
 
+**For advanced examples you can visit the dedicated repository : https://github.com/filoconnesso/tweakly-examples**
+
 ### Installation
 
 1. From Arduino CLI
