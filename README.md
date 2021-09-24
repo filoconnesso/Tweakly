@@ -47,6 +47,7 @@ In development testing Tweakly was tested on:
 * Attiny85
 * ESP8266
 * ESP32
+* SAMD21 (Arduino MRK Wi-Fi 1010 and Arduino Nano 33 IoT)
 
 ### Documentation
 
