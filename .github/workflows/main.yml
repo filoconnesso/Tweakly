@@ -1,0 +1,26 @@
+name: Tweakly
+
+on: [push, pull_request]
+
+jobs:
+  Tweakly-build:
+    strategy:
+      matrix:
+        arduino-platform: ["arduino:avr"]
+        include:
+          - arduino-platform: "arduino:avr"
+            fqbn: "arduino:avr:uno"
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+      - name: Install platform
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install ${{ matrix.arduino-platform }}
+      - name: Compile Sketch
+        run: arduino-cli compile --fqbn ${{ matrix.fqbn }} ./src/Tweakly.h
