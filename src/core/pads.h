@@ -47,6 +47,10 @@ unsigned long _pad_button_default_debounce_millis  = 50;
 #define TO_OFF 3
 
 // Definitions for PWM and ANALOG pin
+#ifndef INPUT_PULLDOWN
+#define INPUT_PULLDOWN 150
+#endif
+
 #define MELODY_OUTPUT 168
 #define PWM_OUTPUT 169
 #define ANALOG_INPUT 170
@@ -114,6 +118,10 @@ struct _pwm_pads{
 _pads     *_first_pad =        NULL, *_last_pad =  NULL;
 _pwm_pads *_first_pwm_pad =    NULL, *_last_pwm_pad =  NULL;
 
+void nullCallback() {
+  //
+}
+
 // Pad class: initialize a pin of your board 
 class Pad{
   private : 
@@ -144,6 +152,10 @@ class Pad{
         _new_pad->_pad_switch_status = !_pad_start_value;
         _new_pad->_pad_switch_release_button = 1;
         _new_pad->_pad_old_status = digitalRead(_new_pad->_pad_number);
+        if(_pad_mode == INPUT || _pad_mode == INPUT_PULLUP || _pad_mode == INPUT_PULLDOWN) {
+          _new_pad->_click_callback_function = nullCallback;
+          _new_pad->_release_callback_function = nullCallback;
+        }
       }
       pinMode(_pad_number, _pad_mode);
       if (_pad_mode == OUTPUT){
@@ -155,6 +167,8 @@ class Pad{
           _new_pad->_pad_output_to_off = false;
           _new_pad->_pad_output_to_on = true;
         }
+        _new_pad->_to_off_callback_function = nullCallback;
+        _new_pad->_to_on_callback_function = nullCallback;
       }
       _last_pad = _new_pad;
       if (!_pad_exists){
@@ -218,6 +232,7 @@ class Pad{
   }
 
 };
+
 
 // Pad Class onEvent Function : Modern function for capturing events on a pin
 void Pad::onEvent(uint8_t _event, _pad_callback _callback) {
@@ -620,7 +635,6 @@ void Loop() {
               _this_pad->_pad_output_to_on = true;
               _this_pad->_pad_output_to_off = false;
               _this_pad->_to_on_callback_function();
-
             }
           }
           if(_this_pad->_pad_status == LOW) {
