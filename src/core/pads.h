@@ -34,8 +34,17 @@
 
 namespace tweaklypads {
 
+// Type definition
+typedef void (*_pad_callback)();
+
 // Variables
 unsigned long _pad_button_default_debounce_millis  = 50;
+
+// Pad event
+#define CLICK 0
+#define RELEASE 1
+#define TO_ON 2
+#define TO_OFF 3
 
 // Definitions for PWM and ANALOG pin
 #define MELODY_OUTPUT 168
@@ -69,11 +78,18 @@ struct _pads{
   bool           _pad_debounced_start_status;
   bool           _pad_switch_status;
   bool           _pad_switch_release_button;
+  bool           _pad_button_releasing;
+  bool           _pad_output_to_on;
+  bool           _pad_output_to_off;
   bool           _pad_old_status;
   uint8_t        _pad_mode;                           
   unsigned long  _pad_debounce_current_millis;
   unsigned long  _pad_debounce_previous_millis;
   unsigned long  _pad_debounce_delay_millis;
+  _pad_callback _click_callback_function;
+  _pad_callback _release_callback_function;
+  _pad_callback _to_on_callback_function;
+  _pad_callback _to_off_callback_function;
   _pads *        _next_pad = NULL;
 };
 
@@ -114,6 +130,7 @@ class Pad{
       _new_pad->_pad_number = _pad_number;
       _new_pad->_pad_status = _pad_start_value;
       _new_pad->_pad_mode = _pad_mode;
+      _new_pad->_pad_button_releasing = false;
       _new_pad->_pad_locked = UNLOCK;
       if (_first_pad == NULL){
         _first_pad = _new_pad;
@@ -131,6 +148,13 @@ class Pad{
       pinMode(_pad_number, _pad_mode);
       if (_pad_mode == OUTPUT){
         digitalWrite(_pad_number, _pad_start_value);
+        if(_pad_start_value == 0) {
+          _new_pad->_pad_output_to_off = true;
+          _new_pad->_pad_output_to_on = false;
+        } else {
+          _new_pad->_pad_output_to_off = false;
+          _new_pad->_pad_output_to_on = true;
+        }
       }
       _last_pad = _new_pad;
       if (!_pad_exists){
@@ -162,6 +186,13 @@ class Pad{
 	      esp32::_create_pad(_new_pwm_pad->_pwm_pad_number);
       }
       #endif
+      #if defined(ARDUINO_SAM_DUE)
+      if(_pad_mode == MELODY_OUTPUT) {
+        if(!arduino_boards::_due_buzzer_pad_is_exists(_pad_number)) {
+	        arduino_boards::_due_create_buzzer_pad(_pad_number);
+        }
+      }
+      #endif
       if (!_pwm_pad_exists){
        _pwm_pad_exists = true;
       }
@@ -178,6 +209,7 @@ class Pad{
   void write(uint8_t _value);
   uint16_t read();
   uint8_t pinNumber();
+  void onEvent(uint8_t _event, _pad_callback _callback);
 
   //operator "="
   Pad operator=(const uint8_t _new_value) {
@@ -186,6 +218,30 @@ class Pad{
   }
 
 };
+
+// Pad Class onEvent Function : Modern function for capturing events on a pin
+void Pad::onEvent(uint8_t _event, _pad_callback _callback) {
+  if (_pad_exists){
+    for (_pads *_this_pad = _first_pad; _this_pad != NULL; _this_pad = _this_pad->_next_pad){
+      if (_this_pad->_pad_number == this->_this_pad_number){
+        switch(_event) {
+        case CLICK : 
+          _this_pad->_click_callback_function = _callback; 
+        break;
+        case RELEASE :
+          _this_pad->_release_callback_function = _callback; 
+        break;
+        case TO_ON :
+          _this_pad->_to_on_callback_function = _callback; 
+        break;
+        case TO_OFF :
+          _this_pad->_to_off_callback_function = _callback; 
+        break;
+        }
+      }
+    }
+  }
+}
 
 // Pad Class on Function: Turns on a digital pin 
 void Pad::on() {
@@ -542,6 +598,10 @@ void Loop() {
           if (_this_pad->_pad_status != _this_pad->_pad_previous_status){
             _this_pad->_pad_debounce_previous_millis = _this_pad->_pad_debounce_current_millis;
             _this_pad->_pad_switch_release_button = 1;
+            if(_this_pad->_pad_button_releasing){
+              _this_pad->_pad_button_releasing = false;
+              _this_pad->_release_callback_function();
+            }
           }
           if ((unsigned long)(_this_pad->_pad_debounce_current_millis - _this_pad->_pad_debounce_previous_millis) >= _this_pad->_pad_debounce_delay_millis 
             && _this_pad->_pad_status == _this_pad->_pad_previous_status){
@@ -550,6 +610,24 @@ void Loop() {
             if (_this_pad->_pad_switch_release_button == 1){
                _this_pad->_pad_switch_release_button = 0;
                _this_pad->_pad_switch_status = !_this_pad->_pad_switch_status;
+               _this_pad->_click_callback_function();
+               _this_pad->_pad_button_releasing = true;
+            }
+          }
+        } else {
+          if(_this_pad->_pad_status == HIGH) {
+            if(!_this_pad->_pad_output_to_on) {
+              _this_pad->_pad_output_to_on = true;
+              _this_pad->_pad_output_to_off = false;
+              _this_pad->_to_on_callback_function();
+
+            }
+          }
+          if(_this_pad->_pad_status == LOW) {
+            if(!_this_pad->_pad_output_to_off) {
+              _this_pad->_pad_output_to_on = false;
+              _this_pad->_pad_output_to_off = true;
+              _this_pad->_to_off_callback_function();
             }
           }
         }

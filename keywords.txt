@@ -16,14 +16,6 @@ Player	KEYWORD1
 Clock	KEYWORD1
 Pong	KEYWORD1
 
-####################################### 
-# Class colors for definitions
-#######################################
-
-console	KEYWORD1
-i2c	KEYWORD1
-sleep	KEYWORD1
-
 #######################################
 # Methods and Functions 
 #######################################	
@@ -52,6 +44,10 @@ pinNumber	KEYWORD2
 attach	KEYWORD2
 pause	KEYWORD2
 play	KEYWORD2
+kick	KEYWORD2
+onEvent	KEYWORD2
+setInterval	KEYWORD2
+dispatchNow	KEYWORD2
 isPaused	KEYWORD2
 addTask	KEYWORD2
 next	KEYWORD2
@@ -78,6 +74,9 @@ autoSync	KEYWORD2
 stringAssembler	KEYWORD2
 setRange	KEYWORD2
 value	KEYWORD2
+startWatch	KEYWORD2
+stopWatch	KEYWORD2
+getWatchTime	KEYWORD2
 
 #######################################
 # ESP32 Methods and Functions 
@@ -125,6 +124,13 @@ tweaklyPriorityHigh_4	LITERAL1
 tweaklyPriorityHighPlus_1	LITERAL1
 tweaklyPriorityHighPlus_2	LITERAL1
 tweaklyPriorityHighPlus_3	LITERAL1
+DISPATCH_FOREVER	LITERAL1
+DISPATCH_ONCE	LITERAL1
+DISPATCH_OFF	LITERAL1
+CLICK	LITERAL1
+RELEASE	LITERAL1
+TO_ON	LITERAL1
+TO_OFF	LITERAL1
 NOTE_B0	LITERAL1
 NOTE_C1	LITERAL1
 NOTE_CS1	LITERAL1
@@ -215,14 +221,3 @@ NOTE_CS8	LITERAL1
 NOTE_D8	LITERAL1
 NOTE_DS8	LITERAL1
 NOTE_END	LITERAL1
-
-#######################################
-# Constants for definitions
-#######################################
-
-same	LITERAL1
-differente	LITERAL1
-greater	LITERAL1
-lesser	LITERAL1
-greaterthanequal	LITERAL1
-lesserthanequal	LITERAL1

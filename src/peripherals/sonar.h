@@ -96,13 +96,15 @@ namespace sonar {
       if (_sonar_exists){
         unsigned long _current_micros = micros();
         for (_sonars *_this_sonar = _first_sonar; _this_sonar != NULL; _this_sonar = _this_sonar->_next_sonar){
+          _current_micros = micros();
           _this_sonar->_sonar_current_micros = _current_micros;
           if(_this_sonar->_sonar_progress_status == 0) {
           digitalWrite(_this_sonar->_sonar_trigger_pin, LOW);
-          _this_sonar->_sonar_delay_micros = 2;
+          _this_sonar->_sonar_delay_micros = 50;
             if ((unsigned long)(_this_sonar->_sonar_current_micros - _this_sonar->_sonar_previous_micros) >= _this_sonar->_sonar_delay_micros){
                digitalWrite(_this_sonar->_sonar_trigger_pin, HIGH);
-               _this_sonar->_sonar_delay_micros = 10;
+               _this_sonar->_sonar_delay_micros = 60;
+               _current_micros = micros();
                _this_sonar->_sonar_previous_micros = _current_micros;
                _this_sonar->_sonar_progress_status = 1;
             }
@@ -110,6 +112,7 @@ namespace sonar {
         if(_this_sonar->_sonar_progress_status == 1) {
            if ((unsigned long)(_this_sonar->_sonar_current_micros - _this_sonar->_sonar_previous_micros) >= _this_sonar->_sonar_delay_micros){
             digitalWrite(_this_sonar->_sonar_trigger_pin, LOW);
+            _current_micros = micros();
             _this_sonar->_sonar_previous_micros = _current_micros;
             _this_sonar->_sonar_progress_status = 2;
            }

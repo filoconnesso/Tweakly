@@ -9,7 +9,7 @@
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MER_esp32_pwm_channelTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
@@ -80,7 +80,7 @@ void _create_pad(uint8_t _pin) {
 	}
 }
 
-//Check if a pin has not already been assigned to a channe
+//Check if a pin has not already been assigned to a channel
 bool _pad_is_exists(uint8_t _pin) {
 	bool _is_exists = false;
 	for (_esp32_pwm_pads *_this_esp32_pad = _first_esp32_pad; _this_esp32_pad != NULL; _this_esp32_pad = _this_esp32_pad->_next_esp32_pad){

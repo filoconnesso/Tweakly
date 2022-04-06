@@ -34,10 +34,6 @@
 
 #include <Arduino.h>
 
-#if defined(ARDUINO_ARCH_SAMD)
-  #include <cstdarg>
-#endif
-
 using namespace std;
 
 //Definitions support
@@ -47,6 +43,12 @@ using namespace std;
 #if defined(ARDUINO_ARCH_ESP32)
   #include "core/machines/esp32.h"
   using namespace esp32;
+#elif defined(ARDUINO_ARCH_ESP8266)
+  #include "core/machines/esp8266.h"
+  using namespace esp8266;
+#else
+  #include "core/machines/arduino_boards.h"
+  using namespace arduino_boards;
 #endif
 
 //Include core libs

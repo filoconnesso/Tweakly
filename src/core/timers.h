@@ -33,6 +33,11 @@
 #define TWEAKLYTICKTIMERS_H
 
 namespace tweaklyticktimers {
+
+   //Mode
+   #define DISPATCH_FOREVER 0
+   #define DISPATCH_ONCE 1
+   #define DISPATCH_OFF 2
    
    //Definitions for tick timer priorities
    #define tweaklyPriorityLow_1 0            // -> disabled
@@ -72,6 +77,9 @@ namespace tweaklyticktimers {
      unsigned long  _tick_position;
      uint8_t        _tick_priority;
      bool           _tick_enabled;
+     uint8_t        _tick_mode;
+     unsigned long  _tick_start_watch_time;
+     unsigned long  _tick_stop_watch_time;
     _tick_callback _tick_callback_function;
     _ticks *       _next_tick = NULL;
    };
@@ -86,31 +94,77 @@ namespace tweaklyticktimers {
     TickTimer() {
       _ticks *_new_tick = new _ticks;
       if (_first_tick == NULL){
-      _first_tick = _new_tick;
+        _first_tick = _new_tick;
       }else{
-       _last_tick->_next_tick = _new_tick;
+        _last_tick->_next_tick = _new_tick;
       }
       _new_tick->_tick_priority = tweaklyPriorityHighPlus_3;
       _new_tick->_tick_position = _this_position;
       _new_tick->_tick_enabled = 1;
       _new_tick->_tick_previous_time = 0;
+      _new_tick->_tick_mode = DISPATCH_FOREVER;
       _last_tick = _new_tick;
       if (!_ticks_exists){
         _ticks_exists = true;
       }
     }
-    void attach(unsigned long _new_delay, _tick_callback _callback);
+    void attach(unsigned long _new_delay, _tick_callback _callback, uint8_t _new_mode);
     void setPriority(uint8_t _tick_priority);
+    void setInterval(unsigned long _tick_interval);
+    void dispatchNow();
+    void kick();
     void play();
     void pause();
+    void startWatch();
+    void stopWatch();
+    unsigned long getWatchTime();
   };
 
+  // Tick Class startWatch Function : Set the current milliseconds of the timer for the start of the WatchTime
+  void TickTimer::startWatch() {
+    if(_ticks_exists) {
+      for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+       if (_this_tick->_tick_position == this->_this_position){
+          _this_tick->_tick_start_watch_time = millis();
+        }
+      }
+    } 
+  }
+
+  // Tick Class stopWatch Function : Set the current milliseconds of the timer for the end of WatchTime
+  void TickTimer::stopWatch() {
+    if(_ticks_exists) {
+      for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+       if (_this_tick->_tick_position == this->_this_position){
+          _this_tick->_tick_stop_watch_time = millis();
+        }
+      }
+    } 
+  }
+
+  // Tick Class getWatchTime : Calculate the elapsed time of the WatchTime
+  unsigned long TickTimer::getWatchTime() {
+    unsigned long _current_watch_time = 0;
+    if(_ticks_exists) {
+      for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+       if (_this_tick->_tick_position == this->_this_position){
+          _current_watch_time = _this_tick->_tick_stop_watch_time - _this_tick->_tick_start_watch_time;
+        }
+      }
+    } 
+    return _current_watch_time;
+  }
+
   // Tick Class Attach Function: attach a function to the timer
-  void TickTimer::attach(unsigned long _new_delay, _tick_callback _new_callback) {
+  void TickTimer::attach(unsigned long _new_delay, _tick_callback _new_callback, uint8_t _new_mode = DISPATCH_FOREVER) {
     if (_ticks_exists){
       for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
         if (_this_tick->_tick_position == this->_this_position){
+          if(_new_mode == DISPATCH_OFF) {
+            _this_tick->_tick_enabled = false;
+          }
           _this_tick->_tick_delay = _new_delay;
+          _this_tick->_tick_mode = _new_mode;
           _this_tick->_tick_callback_function = _new_callback;
         }
       }
@@ -137,8 +191,43 @@ namespace tweaklyticktimers {
     } 
   }
 
-   // Tick Class Play Function: active a tick and starts it from a pause state
-   void TickTimer::play() {
+  // Tick Class Set Interval Functions : set interval to Tick
+  void TickTimer::setInterval(unsigned long _tick_interval) {
+    if(_ticks_exists) {
+      for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+       if (_this_tick->_tick_position == this->_this_position){
+          _this_tick->_tick_delay = _tick_interval;
+        }
+      }
+    } 
+  }
+
+  // Tick Class Dispatch Now : run the timer now
+  void TickTimer::dispatchNow() {
+    if(_ticks_exists) {
+      for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+       if (_this_tick->_tick_position == this->_this_position){
+          _this_tick->_tick_callback_function();
+        }
+      }
+    } 
+  }
+
+  // Tick Class Kick : requests the attention of the timer and resets the counter
+  void TickTimer::kick() {
+    if(_ticks_exists) {
+      for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+       if (_this_tick->_tick_position == this->_this_position){
+          _this_tick->_tick_enabled = false;
+          _this_tick->_tick_previous_time = millis();
+          _this_tick->_tick_enabled = true;
+        }
+      }
+    } 
+  }
+
+  // Tick Class Play Function: active a tick and starts it from a pause state
+  void TickTimer::play() {
      if (_ticks_exists){
        for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
         if (_this_tick->_tick_position == this->_this_position){
@@ -180,6 +269,9 @@ namespace tweaklyticktimers {
             if ((unsigned long)(_this_tick->_tick_current_millis - _this_tick->_tick_previous_time) >= _this_tick->_tick_delay){
               _this_tick->_tick_previous_time = _this_tick->_tick_current_millis;
               _this_tick->_tick_callback_function();
+              if(_this_tick->_tick_mode == DISPATCH_ONCE || _this_tick->_tick_mode == DISPATCH_OFF) {
+                _this_tick->_tick_enabled = false;
+              }
             }
           }
           if(_this_tick == _last_tick) {
