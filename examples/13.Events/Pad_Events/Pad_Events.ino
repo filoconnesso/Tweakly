@@ -15,27 +15,32 @@
  //Create led Pad
  Pad led(13);
 
- //Create blinker timer
- TickTimer blinker;
-
  void setup() {
   
   //Start serial
   Serial.begin(115200);
 
-  //Start blinker timer
-  blinker.attach(2000, blink);
-
   //Attach click event to button Pad
   button.onEvent(CLICK, [] {
-    Serial.println("click");
+    Serial.println("click!");
+    led.toggle();
+  });
+
+  //Attach double click event to button Pad
+  button.onEvent(DOUBLE_CLICK, [] {
+    Serial.println("double click!");
+  });
+
+  //Attach long press event to button Pad
+  button.onEvent(LONG_PRESS, [] {
+    Serial.println("long press!");
   });
 
   //Attach release event to button Pad
   button.onEvent(RELEASE, [] {
-    Serial.println("release");
+    Serial.println("release!");
   });
-
+  
   //Attach To On Event to led Pad
   led.onEvent(TO_ON, [] {
     Serial.println("led on!");
@@ -47,13 +52,7 @@
   });
   
  }
-
- //blink is the callback function for timer
- void blink() {
-  //Toggle led
-  led.toggle();
- }
-
+ 
  void loop() {
   //Call Tweakly for ever
   TweaklyRun();
