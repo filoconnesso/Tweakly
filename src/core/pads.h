@@ -160,6 +160,7 @@ class Pad{
         _new_pad->_pad_switch_release_button = 1;
         _new_pad->_pad_old_status = digitalRead(_new_pad->_pad_number);
         if(_pad_mode == INPUT || _pad_mode == INPUT_PULLUP || _pad_mode == INPUT_PULLDOWN) {
+          _new_pad->_pad_rapid_action_time = millis();
           _new_pad->_click_callback_function = nullCallback;
           _new_pad->_release_callback_function = nullCallback;
           _new_pad->_double_click_callback_function = nullCallback;
@@ -351,6 +352,7 @@ void Pad::write(uint8_t _new_value) {
   if (_pwm_pad_exists){
     for (_pwm_pads *_this_pwm_pad = _first_pwm_pad; _this_pwm_pad != NULL; _this_pwm_pad = _this_pwm_pad->_next_pwm_pad){
       if (_this_pwm_pad->_pwm_pad_number == this->_this_pad_number){
+        _this_pwm_pad->_pwm_pad_enabled = true;
         _this_pwm_pad->_pwm_pad_value = _new_value;
         analogWrite(_this_pwm_pad->_pwm_pad_number, _this_pwm_pad->_pwm_pad_value);
       }
@@ -628,13 +630,13 @@ void Loop() {
           if (_this_pad->_pad_status != _this_pad->_pad_previous_status){
             _this_pad->_pad_debounce_previous_millis = _this_pad->_pad_debounce_current_millis;
             _this_pad->_pad_switch_release_button = 1;
-            if(_this_pad->_pad_rapid_action_counter == 2) {
-              _this_pad->_double_click_callback_function();
+            if(_this_pad->_pad_rapid_action_counter == 1 && _current_millis >= _this_pad->_pad_rapid_action_time) {
+              _this_pad->_click_callback_function();
               _this_pad->_pad_rapid_action_counter = 0;
               _this_pad->_pad_long_action = false;
             }
-            if(_this_pad->_pad_rapid_action_counter == 1 && _current_millis >= _this_pad->_pad_rapid_action_time) {
-              _this_pad->_click_callback_function();
+            if(_this_pad->_pad_rapid_action_counter == 2) {
+              _this_pad->_double_click_callback_function();
               _this_pad->_pad_rapid_action_counter = 0;
               _this_pad->_pad_long_action = false;
             }
@@ -704,14 +706,14 @@ void Loop() {
               break;
             case TO_HIGH:
               _this_pwm_pad->_pwm_pad_value++;
-              if (_this_pwm_pad->_pwm_pad_value == _this_pwm_pad->_pwm_max_value){
+              if (_this_pwm_pad->_pwm_pad_value >= _this_pwm_pad->_pwm_max_value){
                 _this_pwm_pad->_pwm_pad_value = _this_pwm_pad->_pwm_max_value;
                 _this_pwm_pad->_pwm_pad_enabled = false;
               }
               break;
             case TO_LOW:
               _this_pwm_pad->_pwm_pad_value--;
-              if (_this_pwm_pad->_pwm_pad_value == _this_pwm_pad->_pwm_min_value){
+              if (_this_pwm_pad->_pwm_pad_value <= _this_pwm_pad->_pwm_min_value){
                 _this_pwm_pad->_pwm_pad_value = _this_pwm_pad->_pwm_min_value;
                 _this_pwm_pad->_pwm_pad_enabled = false;
               }
