@@ -39,18 +39,19 @@ namespace tweaklynumbers {
     //Pong Class :
     class Pong {
       private :
-      float _current_value = 0;
+      double _current_value;
       bool _direction = false;
-      float _start;
-      float _end;
+      double _start;
+      double _end;
       bool _enabled = false;
+      double _resolution;
       public :
       Pong() {}
-      float value();
-      void setRange(float _new_start, float _new_end);
+      double value();
+      void setRange(double _new_start, double _new_end, double _new_resolution);
     };
 
-    float Pong::value() {
+    double Pong::value() {
       if(_enabled) {
         if(_current_value == _start) {
           _direction = true;
@@ -59,15 +60,17 @@ namespace tweaklynumbers {
           _direction = false;
         }
         if(!_direction) {
-          _current_value--;
+          _current_value -= _resolution;
         } else if(_direction) {
-          _current_value++;
+          _current_value += _resolution;
         }
       }
       return _current_value;
     } 
 
-    void Pong::setRange(float _new_start, float _new_end) {
+    void Pong::setRange(double _new_start, double _new_end, double _new_resolution = 1.0) {
+      _current_value = _new_start;
+      _resolution = _new_resolution;
       _start = _new_start;
       _end = _new_end;
       _enabled = true;
