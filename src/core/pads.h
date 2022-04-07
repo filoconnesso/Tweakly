@@ -42,9 +42,11 @@ unsigned long _pad_button_default_debounce_millis  = 50;
 
 // Pad event
 #define CLICK 0
-#define RELEASE 1
-#define TO_ON 2
-#define TO_OFF 3
+#define DOUBLE_CLICK 1
+#define LONG_PRESS 2
+#define RELEASE 3
+#define TO_ON 4
+#define TO_OFF 5
 
 // Definitions for PWM and ANALOG pin
 #ifndef INPUT_PULLDOWN
@@ -86,11 +88,16 @@ struct _pads{
   bool           _pad_output_to_on;
   bool           _pad_output_to_off;
   bool           _pad_old_status;
+  bool           _pad_long_action;
+  int            _pad_rapid_action_counter;
+  unsigned long  _pad_rapid_action_time;
   uint8_t        _pad_mode;                           
   unsigned long  _pad_debounce_current_millis;
   unsigned long  _pad_debounce_previous_millis;
   unsigned long  _pad_debounce_delay_millis;
+  _pad_callback _double_click_callback_function;
   _pad_callback _click_callback_function;
+  _pad_callback _long_press_callback_function;
   _pad_callback _release_callback_function;
   _pad_callback _to_on_callback_function;
   _pad_callback _to_off_callback_function;
@@ -119,7 +126,7 @@ _pads     *_first_pad =        NULL, *_last_pad =  NULL;
 _pwm_pads *_first_pwm_pad =    NULL, *_last_pwm_pad =  NULL;
 
 void nullCallback() {
-  //
+  //null callback
 }
 
 // Pad class: initialize a pin of your board 
@@ -155,6 +162,8 @@ class Pad{
         if(_pad_mode == INPUT || _pad_mode == INPUT_PULLUP || _pad_mode == INPUT_PULLDOWN) {
           _new_pad->_click_callback_function = nullCallback;
           _new_pad->_release_callback_function = nullCallback;
+          _new_pad->_double_click_callback_function = nullCallback;
+          _new_pad->_long_press_callback_function = nullCallback;
         }
       }
       pinMode(_pad_number, _pad_mode);
@@ -242,6 +251,12 @@ void Pad::onEvent(uint8_t _event, _pad_callback _callback) {
         switch(_event) {
         case CLICK : 
           _this_pad->_click_callback_function = _callback; 
+        break;
+        case DOUBLE_CLICK : 
+          _this_pad->_double_click_callback_function = _callback; 
+        break;
+        case LONG_PRESS : 
+          _this_pad->_long_press_callback_function = _callback; 
         break;
         case RELEASE :
           _this_pad->_release_callback_function = _callback; 
@@ -613,21 +628,40 @@ void Loop() {
           if (_this_pad->_pad_status != _this_pad->_pad_previous_status){
             _this_pad->_pad_debounce_previous_millis = _this_pad->_pad_debounce_current_millis;
             _this_pad->_pad_switch_release_button = 1;
+            if(_this_pad->_pad_rapid_action_counter == 2) {
+              _this_pad->_double_click_callback_function();
+              _this_pad->_pad_rapid_action_counter = 0;
+              _this_pad->_pad_long_action = false;
+            }
+            if(_this_pad->_pad_rapid_action_counter == 1 && _current_millis >= _this_pad->_pad_rapid_action_time) {
+              _this_pad->_click_callback_function();
+              _this_pad->_pad_rapid_action_counter = 0;
+              _this_pad->_pad_long_action = false;
+            }
             if(_this_pad->_pad_button_releasing){
               _this_pad->_pad_button_releasing = false;
               _this_pad->_release_callback_function();
             }
           }
           if ((unsigned long)(_this_pad->_pad_debounce_current_millis - _this_pad->_pad_debounce_previous_millis) >= _this_pad->_pad_debounce_delay_millis 
-            && _this_pad->_pad_status == _this_pad->_pad_previous_status){
+             && _this_pad->_pad_status == _this_pad->_pad_previous_status){
             _this_pad->_pad_debounce_previous_millis = _this_pad->_pad_debounce_current_millis;
             _this_pad->_pad_debounced_status = _this_pad->_pad_status;
             if (_this_pad->_pad_switch_release_button == 1){
                _this_pad->_pad_switch_release_button = 0;
                _this_pad->_pad_switch_status = !_this_pad->_pad_switch_status;
-               _this_pad->_click_callback_function();
+               _this_pad->_pad_rapid_action_time = _current_millis + 200;
+               _this_pad->_pad_rapid_action_counter++;
+               _this_pad->_pad_long_action = true;
                _this_pad->_pad_button_releasing = true;
             }
+          }
+          if(_this_pad->_pad_long_action && _current_millis >= _this_pad->_pad_rapid_action_time + 1200) {
+            _this_pad->_pad_long_action = false;
+            _this_pad->_long_press_callback_function();
+          }
+          if(_current_millis > _this_pad->_pad_rapid_action_time) {
+            _this_pad->_pad_rapid_action_counter = 0;
           }
         } else {
           if(_this_pad->_pad_status == HIGH) {
