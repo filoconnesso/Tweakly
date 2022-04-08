@@ -658,7 +658,7 @@ void Loop() {
                _this_pad->_pad_button_releasing = true;
             }
           }
-          if(_this_pad->_pad_long_action && _current_millis >= _this_pad->_pad_rapid_action_time + 1200) {
+          if(_this_pad->_pad_long_action && _current_millis >= _this_pad->_pad_rapid_action_time + 1200 && _this_pad->_pad_button_releasing == true) {
             _this_pad->_pad_long_action = false;
             _this_pad->_long_press_callback_function();
           }
