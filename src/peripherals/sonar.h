@@ -55,6 +55,7 @@ namespace sonar {
       unsigned long   _sonar_previous_micros;
       unsigned long   _sonar_delay_micros;
       uint8_t         _sonar_return_mode;
+      unsigned long   _sonar_timeout;
       _sonar_callback _sonar_change_callback;
       _sonars *       _next_sonar = NULL;
     };
@@ -62,10 +63,11 @@ namespace sonar {
     _sonars   *_first_sonar =      NULL, *_last_sonar =  NULL;
 
     // sonarAttach: attach a sonar
-    void sonarAttach(uint8_t _new_sonar_echo_pin, uint8_t _new_sonar_trigger_pin, _sonar_callback _new_sonar_change_callback, uint8_t _new_sonar_return_mode){
+    void sonarAttach(uint8_t _new_sonar_echo_pin, uint8_t _new_sonar_trigger_pin, _sonar_callback _new_sonar_change_callback, uint8_t _new_sonar_return_mode, unsigned long _new_sonar_timeout = 25000){
       _sonars *_new_sonar = new _sonars;
       _new_sonar->_sonar_echo_pin = _new_sonar_echo_pin;
       _new_sonar->_sonar_trigger_pin = _new_sonar_trigger_pin;
+      _new_sonar->_sonar_timeout = _new_sonar_timeout;
       if (_first_sonar == NULL){
         _first_sonar = _new_sonar;
       }else{
@@ -84,8 +86,8 @@ namespace sonar {
     // Setup for all sonar
     void Setup() {
       if (_sonar_exists){
-        unsigned long _current_micros = micros();
         for (_sonars *_this_sonar = _first_sonar; _this_sonar != NULL; _this_sonar = _this_sonar->_next_sonar){
+        unsigned long _current_micros = micros();
         _this_sonar->_sonar_previous_micros = _current_micros;
         }
       }
@@ -99,47 +101,49 @@ namespace sonar {
           _current_micros = micros();
           _this_sonar->_sonar_current_micros = _current_micros;
           if(_this_sonar->_sonar_progress_status == 0) {
-          digitalWrite(_this_sonar->_sonar_trigger_pin, LOW);
-          _this_sonar->_sonar_delay_micros = 50;
+            digitalWrite(_this_sonar->_sonar_trigger_pin, LOW);
+            _this_sonar->_sonar_delay_micros = 10;
             if ((unsigned long)(_this_sonar->_sonar_current_micros - _this_sonar->_sonar_previous_micros) >= _this_sonar->_sonar_delay_micros){
                digitalWrite(_this_sonar->_sonar_trigger_pin, HIGH);
-               _this_sonar->_sonar_delay_micros = 60;
+               _this_sonar->_sonar_delay_micros = 20;
                _current_micros = micros();
                _this_sonar->_sonar_previous_micros = _current_micros;
                _this_sonar->_sonar_progress_status = 1;
             }
-        }
-        if(_this_sonar->_sonar_progress_status == 1) {
-           if ((unsigned long)(_this_sonar->_sonar_current_micros - _this_sonar->_sonar_previous_micros) >= _this_sonar->_sonar_delay_micros){
-            digitalWrite(_this_sonar->_sonar_trigger_pin, LOW);
-            _current_micros = micros();
-            _this_sonar->_sonar_previous_micros = _current_micros;
-            _this_sonar->_sonar_progress_status = 2;
-           }
-        }
-        if(_this_sonar->_sonar_progress_status == 2) {
-           long micros;
-             micros = pulseIn(_this_sonar->_sonar_echo_pin, HIGH);
+          }
+          if(_this_sonar->_sonar_progress_status == 1) {
+             if ((unsigned long)(_this_sonar->_sonar_current_micros - _this_sonar->_sonar_previous_micros) >= _this_sonar->_sonar_delay_micros){
+               digitalWrite(_this_sonar->_sonar_trigger_pin, LOW);
+               _current_micros = micros();
+              _this_sonar->_sonar_previous_micros = _current_micros;
+               _this_sonar->_sonar_progress_status = 2;
+             }
+          }
+          if(_this_sonar->_sonar_progress_status == 2) {
+             unsigned long micros;
+             micros = pulseIn(_this_sonar->_sonar_echo_pin, HIGH, _this_sonar->_sonar_timeout);
+             if(micros != 0) {
              switch(_this_sonar->_sonar_return_mode) {
              case SONAR_MICROSECONDS : 
-               _this_sonar->_sonar_change_callback(micros);
+                _this_sonar->_sonar_change_callback(micros);
              break;
              case SONAR_MILLISECONDS : 
-               long millis;
+               unsigned long millis;
                millis = micros / 1000;
-               _this_sonar->_sonar_change_callback(millis);
+                _this_sonar->_sonar_change_callback(millis);
              break;
              case SONAR_CENTIMETERS : 
-               long distance_cm;
+               unsigned long distance_cm;
                distance_cm = micros / 29 / 2;
-               _this_sonar->_sonar_change_callback(distance_cm);
+                _this_sonar->_sonar_change_callback(distance_cm);
              break;
              case SONAR_INCHES :
-               long distance_inches;
+               unsigned long distance_inches;
                distance_inches = micros / 74 / 2;
-               _this_sonar->_sonar_change_callback(distance_inches);
+                _this_sonar->_sonar_change_callback(distance_inches);
              break;
            }
+             }
          _this_sonar->_sonar_progress_status = 0;
          }
        } 
