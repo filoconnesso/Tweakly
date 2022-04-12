@@ -55,7 +55,7 @@ unsigned long _pad_button_default_debounce_millis  = 50;
 
 #define MELODY_OUTPUT 168
 #define PWM_OUTPUT 169
-#define ANALOG_INPUT 170
+#define ANALOG_INPUT 190
 
 // Definitions for locked and unlocked pads
 #define LOCK 1
@@ -153,22 +153,25 @@ class Pad{
         _last_pad->_next_pad = _new_pad;
       }
       if (_pad_mode != OUTPUT){
+        if(_pad_mode != ANALOG_INPUT) {
         _new_pad->_pad_previous_status = _pad_start_value;
         _new_pad->_pad_debounce_delay_millis = _pad_button_default_debounce_millis;
         _new_pad->_pad_debounced_status = 0;
         _new_pad->_pad_switch_status = !_pad_start_value;
         _new_pad->_pad_switch_release_button = 1;
         _new_pad->_pad_old_status = digitalRead(_new_pad->_pad_number);
-        if(_pad_mode == INPUT || _pad_mode == INPUT_PULLUP || _pad_mode == INPUT_PULLDOWN) {
-          _new_pad->_pad_rapid_action_time = millis();
-          _new_pad->_click_callback_function = nullCallback;
-          _new_pad->_release_callback_function = nullCallback;
-          _new_pad->_double_click_callback_function = nullCallback;
-          _new_pad->_long_press_callback_function = nullCallback;
+           if(_pad_mode == INPUT || _pad_mode == INPUT_PULLUP || _pad_mode == INPUT_PULLDOWN) {
+              _new_pad->_pad_rapid_action_time = millis();
+              _new_pad->_click_callback_function = nullCallback;
+              _new_pad->_release_callback_function = nullCallback;
+              _new_pad->_double_click_callback_function = nullCallback;
+              _new_pad->_long_press_callback_function = nullCallback;
+           }
+        pinMode(_pad_number, _pad_mode);
         }
       }
-      pinMode(_pad_number, _pad_mode);
       if (_pad_mode == OUTPUT){
+        pinMode(_pad_number, _pad_mode);
         digitalWrite(_pad_number, _pad_start_value);
         if(_pad_start_value == 0) {
           _new_pad->_pad_output_to_off = true;
@@ -363,7 +366,7 @@ void Pad::write(uint8_t _new_value) {
 
 // Pad Class read Function: Reads the value of a digital or analog pin 
 uint16_t Pad::read() {
-  uint16_t _pad_value = 0;
+  unsigned long _pad_value = 0;
   if(this->_this_pad_mode != ANALOG_INPUT) {
     // If the pin is not an analog input 
     if (_pad_exists){
