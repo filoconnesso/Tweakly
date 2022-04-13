@@ -137,91 +137,91 @@ class Pad{
   public :
   Pad(uint8_t _pad_number, uint8_t _pad_mode = OUTPUT, const char *_pad_class = "nope", uint8_t _pad_start_value = 0, uint8_t _pad_min_value = 0, uint8_t _pad_max_value = 255) {
     _this_pad_number = _pad_number;
-    if(_pad_mode != PWM_OUTPUT) {
-      // If the pin is set in INPUT, INPUT_PULLUP, INPUT_PULLDOWN or OUTPUT mode
-      _this_pad_mode = _pad_mode;
-      _pads *_new_pad = new _pads;
-      _new_pad->_pad_class = _pad_class;
-      _new_pad->_pad_number = _pad_number;
-      _new_pad->_pad_status = _pad_start_value;
-      _new_pad->_pad_mode = _pad_mode;
-      _new_pad->_pad_button_releasing = false;
-      _new_pad->_pad_locked = UNLOCK;
-      if (_first_pad == NULL){
-        _first_pad = _new_pad;
-      }else{
-        _last_pad->_next_pad = _new_pad;
-      }
-      if (_pad_mode != OUTPUT){
-        if(_pad_mode != ANALOG_INPUT) {
-        _new_pad->_pad_previous_status = _pad_start_value;
-        _new_pad->_pad_debounce_delay_millis = _pad_button_default_debounce_millis;
-        _new_pad->_pad_debounced_status = 0;
-        _new_pad->_pad_switch_status = !_pad_start_value;
-        _new_pad->_pad_switch_release_button = 1;
-        _new_pad->_pad_old_status = digitalRead(_new_pad->_pad_number);
-           if(_pad_mode == INPUT || _pad_mode == INPUT_PULLUP || _pad_mode == INPUT_PULLDOWN) {
+    if(_pad_mode != ANALOG_INPUT) {
+      if(_pad_mode != PWM_OUTPUT) {
+        // If the pin is set in INPUT, INPUT_PULLUP, INPUT_PULLDOWN or OUTPUT mode
+        _this_pad_mode = _pad_mode;
+        _pads *_new_pad = new _pads;
+        _new_pad->_pad_class = _pad_class;
+        _new_pad->_pad_number = _pad_number;
+        _new_pad->_pad_status = _pad_start_value;
+        _new_pad->_pad_mode = _pad_mode;
+        _new_pad->_pad_button_releasing = false;
+        _new_pad->_pad_locked = UNLOCK;
+        if (_first_pad == NULL){
+          _first_pad = _new_pad;
+        }else{
+          _last_pad->_next_pad = _new_pad;
+        }
+        if (_pad_mode != OUTPUT){
+          _new_pad->_pad_previous_status = _pad_start_value;
+          _new_pad->_pad_debounce_delay_millis = _pad_button_default_debounce_millis;
+          _new_pad->_pad_debounced_status = 0;
+          _new_pad->_pad_switch_status = !_pad_start_value;
+          _new_pad->_pad_switch_release_button = 1;
+          _new_pad->_pad_old_status = digitalRead(_new_pad->_pad_number);
+            if(_pad_mode == INPUT || _pad_mode == INPUT_PULLUP || _pad_mode == INPUT_PULLDOWN) {
               _new_pad->_pad_rapid_action_time = millis();
               _new_pad->_click_callback_function = nullCallback;
               _new_pad->_release_callback_function = nullCallback;
               _new_pad->_double_click_callback_function = nullCallback;
               _new_pad->_long_press_callback_function = nullCallback;
-           }
-        pinMode(_pad_number, _pad_mode);
+            }
+          pinMode(_pad_number, _pad_mode);
+        }
+        if (_pad_mode == OUTPUT){
+          pinMode(_pad_number, _pad_mode);
+          digitalWrite(_pad_number, _pad_start_value);
+          if(_pad_start_value == 0) {
+            _new_pad->_pad_output_to_off = true;
+            _new_pad->_pad_output_to_on = false;
+          } else {
+            _new_pad->_pad_output_to_off = false;
+            _new_pad->_pad_output_to_on = true;
+          }
+          _new_pad->_to_off_callback_function = nullCallback;
+          _new_pad->_to_on_callback_function = nullCallback;
+        }
+        _last_pad = _new_pad;
+        if (!_pad_exists){
+          _pad_exists = true;
         }
       }
-      if (_pad_mode == OUTPUT){
-        pinMode(_pad_number, _pad_mode);
-        digitalWrite(_pad_number, _pad_start_value);
-        if(_pad_start_value == 0) {
-          _new_pad->_pad_output_to_off = true;
-          _new_pad->_pad_output_to_on = false;
-        } else {
-          _new_pad->_pad_output_to_off = false;
-          _new_pad->_pad_output_to_on = true;
+      if(_pad_mode == PWM_OUTPUT || _pad_mode == MELODY_OUTPUT) {
+        // If the pin is set in PWM_OUTPUT mode 
+        _this_pad_mode = PWM_OUTPUT;
+        _pwm_pads *_new_pwm_pad = new _pwm_pads;
+        _new_pwm_pad->_pwm_pad_number = _pad_number;
+        _new_pwm_pad->_pwm_pad_locked = UNLOCK;
+        if (_first_pwm_pad == NULL){
+          _first_pwm_pad = _new_pwm_pad;
+        }else{
+        _last_pwm_pad->_next_pwm_pad = _new_pwm_pad;
         }
-        _new_pad->_to_off_callback_function = nullCallback;
-        _new_pad->_to_on_callback_function = nullCallback;
-      }
-      _last_pad = _new_pad;
-      if (!_pad_exists){
-        _pad_exists = true;
-      }
-    }
-    if(_pad_mode == PWM_OUTPUT || _pad_mode == MELODY_OUTPUT) {
-      // If the pin is set in PWM_OUTPUT mode 
-      _this_pad_mode = PWM_OUTPUT;
-      _pwm_pads *_new_pwm_pad = new _pwm_pads;
-      _new_pwm_pad->_pwm_pad_number = _pad_number;
-      _new_pwm_pad->_pwm_pad_locked = UNLOCK;
-      if (_first_pwm_pad == NULL){
-        _first_pwm_pad = _new_pwm_pad;
-      }else{
-      _last_pwm_pad->_next_pwm_pad = _new_pwm_pad;
-      }
-      pinMode(_pad_number, OUTPUT);
-      _last_pwm_pad = _new_pwm_pad;
-      _new_pwm_pad->_pwm_pad_class = _pad_class;
-      _new_pwm_pad->_pwm_pad_value = _pad_start_value;
-      _new_pwm_pad->_pwm_min_value = _pad_min_value;
-      _new_pwm_pad->_pwm_max_value = _pad_max_value;
-      _new_pwm_pad->_pwm_pad_fade_direction = false;
-      _new_pwm_pad->_pwm_pad_enabled = true;
-      _new_pwm_pad->_fade_effect = false;
-      #if defined(ARDUINO_ARCH_ESP32)
-      if(!esp32::_pad_is_exists(_new_pwm_pad->_pwm_pad_number)) {
-	      esp32::_create_pad(_new_pwm_pad->_pwm_pad_number);
-      }
-      #endif
-      #if defined(ARDUINO_SAM_DUE)
-      if(_pad_mode == MELODY_OUTPUT) {
-        if(!arduino_boards::_due_buzzer_pad_is_exists(_pad_number)) {
-	        arduino_boards::_due_create_buzzer_pad(_pad_number);
+        pinMode(_pad_number, OUTPUT);
+        _last_pwm_pad = _new_pwm_pad;
+        _new_pwm_pad->_pwm_pad_class = _pad_class;
+        _new_pwm_pad->_pwm_pad_value = _pad_start_value;
+        _new_pwm_pad->_pwm_min_value = _pad_min_value;
+        _new_pwm_pad->_pwm_max_value = _pad_max_value;
+        _new_pwm_pad->_pwm_pad_fade_direction = false;
+        _new_pwm_pad->_pwm_pad_enabled = true;
+        _new_pwm_pad->_fade_effect = false;
+        #if defined(ARDUINO_ARCH_ESP32)
+        if(!esp32::_pad_is_exists(_new_pwm_pad->_pwm_pad_number)) {
+	        esp32::_create_pad(_new_pwm_pad->_pwm_pad_number);
         }
-      }
-      #endif
-      if (!_pwm_pad_exists){
-       _pwm_pad_exists = true;
+        #endif
+        #if defined(ARDUINO_SAM_DUE)
+        if(_pad_mode == MELODY_OUTPUT) {
+          if(!arduino_boards::_due_buzzer_pad_is_exists(_pad_number)) {
+	          arduino_boards::_due_create_buzzer_pad(_pad_number);
+          }
+        }
+        #endif
+        if (!_pwm_pad_exists){
+         _pwm_pad_exists = true;
+        }
       }
     }
     // If the pin is set to ANALOG_INPUT mode, no change is made to the pin 
@@ -234,7 +234,7 @@ class Pad{
   void lock();
   void unlock();
   void write(uint8_t _value);
-  uint16_t read();
+  unsigned long read();
   uint8_t pinNumber();
   void onEvent(uint8_t _event, _pad_callback _callback);
 
