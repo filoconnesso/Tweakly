@@ -137,10 +137,10 @@ class Pad{
   public :
   Pad(uint8_t _pad_number, uint8_t _pad_mode = OUTPUT, const char *_pad_class = "nope", uint8_t _pad_start_value = 0, uint8_t _pad_min_value = 0, uint8_t _pad_max_value = 255) {
     _this_pad_number = _pad_number;
+    _this_pad_mode = _pad_mode;
     if(_pad_mode != ANALOG_INPUT) {
       if(_pad_mode != PWM_OUTPUT) {
         // If the pin is set in INPUT, INPUT_PULLUP, INPUT_PULLDOWN or OUTPUT mode
-        _this_pad_mode = _pad_mode;
         _pads *_new_pad = new _pads;
         _new_pad->_pad_class = _pad_class;
         _new_pad->_pad_number = _pad_number;
@@ -189,7 +189,6 @@ class Pad{
       }
       if(_pad_mode == PWM_OUTPUT || _pad_mode == MELODY_OUTPUT) {
         // If the pin is set in PWM_OUTPUT mode 
-        _this_pad_mode = PWM_OUTPUT;
         _pwm_pads *_new_pwm_pad = new _pwm_pads;
         _new_pwm_pad->_pwm_pad_number = _pad_number;
         _new_pwm_pad->_pwm_pad_locked = UNLOCK;
@@ -234,7 +233,7 @@ class Pad{
   void lock();
   void unlock();
   void write(uint8_t _value);
-  unsigned long read();
+  uint16_t read();
   uint8_t pinNumber();
   void onEvent(uint8_t _event, _pad_callback _callback);
 
