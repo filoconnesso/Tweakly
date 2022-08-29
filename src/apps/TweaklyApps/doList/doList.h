@@ -32,6 +32,8 @@
 #ifndef DOLIST_H
 #define DOLIST_H
 
+#include "Arduino.h"
+
 namespace dolist {
 
    //Variables
@@ -42,32 +44,40 @@ namespace dolist {
 
    //Enablers
    volatile bool _list_exists  { false };
-   
+
    // Struct required for lists
    struct _lists{
-     uint16_t       _list_index;
-     uint16_t       _functions_counter;
-     _list_callback _function_callback;
-     _lists *       _next_function = NULL;
+      uint16_t       _list_index;
+      int            _functions_counter;
+      _list_callback _function_callback;
+      _lists *       _next_function = NULL;
    };
 
-   _lists    *_first_function =   NULL, *_last_function = NULL;
-
+   _lists *_first_function = NULL; 
+   _lists *_last_function = NULL;
+   
    //Class for doList
    class doList {
      private :
-     uint16_t _list_position = _lists_counter++;
-     uint16_t _list_function_position_counter = 0;
-     uint16_t _functions_counter = 0;
+     uint16_t _list_position;
+     int      _list_function_position_counter;
+     int      _functions_counter;
      public :
      doList() {
-
+       _list_position = _lists_counter++;
+       _list_function_position_counter = 0;
+       _functions_counter = 0;
      }
      void addTask(_list_callback _function);
      void next();
+     void back();
      //operator "++"
      doList operator++(int) {
        this->next();
+       return *this;
+     }
+     doList operator--(int) {
+       this->back();
        return *this;
      }
    };
@@ -89,7 +99,7 @@ namespace dolist {
      }
     }
 
-    // next Function : go to the task in the next list 
+    // next Function : go to the next task
     void doList::next(){
        if (_list_exists){
          for (_lists *_this_function = _first_function; _this_function != NULL; _this_function = _this_function->_next_function){
@@ -99,10 +109,27 @@ namespace dolist {
             }
            }
           }
-         this->_list_function_position_counter++;
-         if(this->_list_function_position_counter >= this->_functions_counter) {
-             this->_list_function_position_counter = 0;
-         }
+          this->_list_function_position_counter++;
+          if(this->_list_function_position_counter > this->_functions_counter - 1) {
+            this->_list_function_position_counter = 0;
+          }
+      } 
+    }
+    
+    // back Functions : go to the previous task
+    void doList::back(){
+       if (_list_exists){
+         for (_lists *_this_function = _first_function; _this_function != NULL; _this_function = _this_function->_next_function){
+          if (this->_list_position == _this_function->_list_index){
+            if(_this_function->_functions_counter == this->_list_function_position_counter) {
+              _this_function->_function_callback();
+            }
+           }
+          }
+          this->_list_function_position_counter--;
+          if(this->_list_function_position_counter < 0) {
+            this->_list_function_position_counter = this->_functions_counter - 1;
+          }
       }
     }
 

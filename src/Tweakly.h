@@ -58,6 +58,7 @@ using namespace std;
 #include "core/clock.h"
 #include "core/string.h"
 #include "core/numbers.h"
+#include "core/macros.h"
 
 using namespace tweaklypads;
 using namespace tweaklyticktimers;
@@ -65,6 +66,7 @@ using namespace tweaklypolyphonic;
 using namespace tweaklyclock;
 using namespace tweaklystring;
 using namespace tweaklynumbers;
+using namespace asyncer;
 
 //Include peripherals libs
 #include "peripherals/sonar.h"
@@ -90,6 +92,8 @@ void TweaklyRun(){
     //peripherals
     sonar::Setup();
     encoder::Setup();
+    //Tweakly statements
+    asyncer::Setup();
     _tweakly_ready = true;
   } else {
     //core
@@ -100,6 +104,8 @@ void TweaklyRun(){
     //peripherals
     sonar::Loop();
     encoder::Loop(); 
+    //Tweakly statements
+    asyncer::Loop();
   }
 }
 

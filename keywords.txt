@@ -15,6 +15,8 @@ Echo	KEYWORD1
 Player	KEYWORD1
 Clock	KEYWORD1
 Pong	KEYWORD1
+Async	KEYWORD1
+padSettings	KEYWORD1
 
 #######################################
 # Methods and Functions 
@@ -77,6 +79,12 @@ value	KEYWORD2
 startWatch	KEYWORD2
 stopWatch	KEYWORD2
 getWatchTime	KEYWORD2
+sleep_for	KEYWORD2
+longPressTimer	KEYWORD2
+doubleClickTimer	KEYWORD2
+debounceTimer	KEYWORD2
+adjust	KEYWORD2
+back	KEYWORD2
 
 #######################################
 # ESP32 Methods and Functions 
@@ -223,3 +231,10 @@ NOTE_CS8	LITERAL1
 NOTE_D8	LITERAL1
 NOTE_DS8	LITERAL1
 NOTE_END	LITERAL1
+
+#######################################
+# Macros
+#######################################
+
+TWEAKLY_ROLLUP	KEYWORD3	RESERVED_WORD
+END_ROLLUP	KEYWORD3	RESERVED_WORD
