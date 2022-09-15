@@ -1,18 +1,14 @@
-name: Tweakly
-
+name: Tweakly-nanorp2040connect
 on: [push, pull_request]
-
 jobs:
-  Tweakly-build:
+  Tweakly-nanorp2040connect:
     strategy:
       matrix:
-        arduino-platform: ["arduino:avr"]
+        arduino-platform: ["arduino:mbed"]
         include:
-          - arduino-platform: "arduino:avr"
-            fqbn: "arduino:avr:uno"
-
+          - arduino-platform: "arduino:mbed"
+            fqbn: "arduino:mbed:nanorp2040connect"
     runs-on: windows-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2

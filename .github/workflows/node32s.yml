@@ -1,0 +1,27 @@
+name: Tweakly-node32s
+
+on: [push, pull_request]
+
+jobs:
+  Tweakly-node32s:
+    strategy:
+      matrix:
+        arduino-platform: ["esp32:esp32"]
+        include:
+          - arduino-platform: "esp32:esp32"
+            fqbn: "esp32:esp32:node32s"
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+      - name: Install platform
+        run: |
+          arduino-cli lib install Tweakly
+          arduino-cli  core update-index --additional-urls https://dl.espressif.com/dl/package_esp32_index.json
+          arduino-cli core install esp32:esp32 --additional-urls https://dl.espressif.com/dl/package_esp32_index.json
+      - name: Compile Sketch
+        run: arduino-cli compile --fqbn ${{ matrix.fqbn }} ./examples/01.Basic/Analog_input_Pad/Analog_input_Pad.ino
