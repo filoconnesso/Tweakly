@@ -1,0 +1,27 @@
+name: Tweakly-arduino_due_x
+
+on: [push, pull_request]
+
+jobs:
+  Tweakly-arduino_due_x:
+    strategy:
+      matrix:
+        arduino-platform: ["arduino:sam"]
+        include:
+          - arduino-platform: "arduino:sam"
+            fqbn: "arduino:sam:arduino_due_x"
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v1
+      - name: Install platform
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install ${{ matrix.arduino-platform }}
+          arduino-cli lib install Tweakly
+      - name: Compile Sketch
+        run: arduino-cli compile --fqbn ${{ matrix.fqbn }} ./examples/01.Basic/Analog_input_Pad/Analog_input_Pad.ino
