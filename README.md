@@ -92,7 +92,9 @@ If you want to create non-blocking code, rely on TickTimers.
 Initialize it in **setup()** with:
  
    ```cpp
-   blinker.attach(1000, [] { led.toggle(); });
+   blinker.attach(1000, [] { 
+    led.toggle(); 
+   });
    ```
 And your led will start blinking without blocking your code! Is not it fantastic ?
 
