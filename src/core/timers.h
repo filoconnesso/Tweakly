@@ -218,9 +218,9 @@ namespace tweaklyticktimers {
     if(_ticks_exists) {
       for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
        if (_this_tick->_tick_position == this->_this_position){
-          _this_tick->_tick_enabled = false;
+          _this_tick->_tick_enabled = 0;
           _this_tick->_tick_previous_time = millis();
-          _this_tick->_tick_enabled = true;
+          _this_tick->_tick_enabled = 1;
         }
       }
     } 
@@ -251,8 +251,8 @@ namespace tweaklyticktimers {
    // Setup all Tick Timers
    void Setup() {
      if (_ticks_exists){
-       unsigned long _current_millis = millis();
        for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+          unsigned long _current_millis = millis();
           _this_tick->_tick_previous_time = _current_millis;
        }
      }
@@ -261,25 +261,25 @@ namespace tweaklyticktimers {
    // Loop for all Tick Timers
    void Loop() {
      if (_ticks_exists){
-      unsigned long _current_millis = millis();
       for (_ticks *_this_tick = _first_tick; _this_tick != NULL; _this_tick = _this_tick->_next_tick){
+        unsigned long _current_millis = millis();
+        _this_tick->_tick_current_millis = _current_millis;
         if (_this_tick->_tick_enabled){
-          _this_tick->_tick_current_millis = _current_millis;
           if(_this_tick->_tick_priority == _tweakly_priority_counter) {
             if ((unsigned long)(_this_tick->_tick_current_millis - _this_tick->_tick_previous_time) >= _this_tick->_tick_delay){
               _this_tick->_tick_previous_time = _this_tick->_tick_current_millis;
               _this_tick->_tick_callback_function();
-              if(_this_tick->_tick_mode == DISPATCH_ONCE || _this_tick->_tick_mode == DISPATCH_OFF) {
-                _this_tick->_tick_enabled = false;
+              if((_this_tick->_tick_mode == DISPATCH_ONCE || _this_tick->_tick_mode == DISPATCH_OFF) && _this_tick->_tick_enabled == 1) {
+                _this_tick->_tick_enabled = 0;
               }
             }
           }
-          if(_this_tick == _last_tick) {
-            _tweakly_priority_counter--;
-          }
-          if(_tweakly_priority_counter == 0) {
+        }
+        if(_this_tick == _last_tick) {
+          _tweakly_priority_counter--;
+        }
+        if(_tweakly_priority_counter == 0) {
             _tweakly_priority_counter = 15;
-          }
         }
       }
     }
